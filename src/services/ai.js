@@ -52,21 +52,72 @@ async function analyzeCode(prDetails, files, onProgress) {
   return parseAnalysis(analysis, prDetails, files);
 }
 
+// Prompt 最大字符数限制（约 15万字符，约 4万 tokens）
+const MAX_PROMPT_LENGTH = 150000;
+
 /**
- * 构建分析prompt
+ * 构建分析prompt（带截断处理）
  */
 function buildAnalysisPrompt(prDetails, files) {
-  const filesSummary = files.map(f => {
+  const HEADER_LENGTH = 2000; // 预留给 PR 信息和评审要求
+  const MAX_DIFF_LENGTH = MAX_PROMPT_LENGTH - HEADER_LENGTH;
+
+  // 按变更大小排序，优先分析变更较大的文件
+  const sortedFiles = [...files].sort((a, b) => b.changes - a.changes);
+
+  let totalLength = 0;
+  const truncatedFiles = [];
+  let truncatedCount = 0;
+
+  for (const f of sortedFiles) {
+    const fileHeader = `文件: ${f.filename}
+状态: ${f.status}
+新增行数: ${f.additions}
+删除行数: ${f.deletions}
+代码变更:
+`;
+
+    const diff = f.patch || '无diff';
+    const fileLength = fileHeader.length + diff.length + 10; // 10 for separator
+
+    if (totalLength + fileLength <= MAX_DIFF_LENGTH) {
+      truncatedFiles.push({
+        ...f,
+        truncatedDiff: diff
+      });
+      totalLength += fileLength;
+    } else {
+      // 尝试截断 diff 内容
+      const remainingLength = MAX_DIFF_LENGTH - totalLength - fileHeader.length - 50;
+      if (remainingLength > 200) {
+        truncatedFiles.push({
+          ...f,
+          truncatedDiff: diff.substring(0, remainingLength) + '\n... [已截断]'
+        });
+        truncatedCount++;
+        break;
+      } else {
+        truncatedCount++;
+        break;
+      }
+    }
+  }
+
+  const filesSummary = truncatedFiles.map(f => {
     return `文件: ${f.filename}
 状态: ${f.status}
 新增行数: ${f.additions}
 删除行数: ${f.deletions}
 代码变更:
 \`\`\`
-${f.patch || '无diff'}
+${f.truncatedDiff}
 \`\`\`
 `;
   }).join('\n---\n');
+
+  const truncationNotice = truncatedCount > 0
+    ? `\n\n注意：由于 PR 较大，已截断 ${truncatedCount} 个文件的分析。以上是变更最大的 ${truncatedFiles.length} 个文件。`
+    : '';
 
   return `你是一个专业的代码评审专家。请分析以下Pull Request的代码变更，并提供详细的评审报告。
 
@@ -108,7 +159,7 @@ ${filesSummary}
 ### 5. 总体评价
 总结评审结论，是否建议合并，以及需要重点关注的问题。
 
-请确保评审准确、专业、有建设性。`;
+请确保评审准确、专业、有建设性。${truncationNotice}`;
 }
 
 /**
