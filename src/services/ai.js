@@ -186,29 +186,48 @@ function parseAnalysis(analysis, prDetails, files) {
 
 /**
  * 提取指定章节内容
+ * 使用更精确的匹配：找到章节标题后，一直匹配到下一个同级章节标题或文档结尾
  */
 function extractSection(text, sectionName) {
-  const regex = new RegExp(`###?\\s*\\d*\\.?\\s*${sectionName}[\\s\\S]*?(?=###|$)`, 'i');
-  const match = text.match(regex);
+  // 找到章节标题的位置
+  const headerRegex = new RegExp(`###?\\s*\\d*\\.?\\s*${sectionName}`, 'i');
+  const headerMatch = text.match(headerRegex);
 
-  if (match) {
-    return match[0]
-      .replace(/###?\s*\d*\.?\s*/, '')
-      .trim();
+  if (!headerMatch) {
+    return '未找到相关分析';
   }
 
-  return '未找到相关分析';
+  const startIndex = headerMatch.index + headerMatch[0].length;
+
+  // 找到下一个 ### 标题的位置（跳过当前标题行）
+  const remainingText = text.substring(startIndex);
+  const nextHeaderRegex = /\n###?\s+\d*\.?\s*[A-Za-z一-龥]/;
+  const nextHeaderMatch = remainingText.match(nextHeaderRegex);
+
+  let content;
+  if (nextHeaderMatch) {
+    content = remainingText.substring(0, nextHeaderMatch.index);
+  } else {
+    content = remainingText;
+  }
+
+  return content.trim() || '未找到相关分析';
 }
 
 /**
- * 提取评分
+ * 提取评分（支持整数和小数）
  */
 function extractScore(text) {
-  const regex = /(\d+)\s*[/／]\s*10|评分[：:]\s*(\d+)/;
+  // 支持：7/10, 7.5/10, 评分：7, 评分：7.5, 7分, 7.5分
+  const regex = /(\d+\.?\d*)\s*[/／]\s*10|评分[：:]\s*(\d+\.?\d*)|(\d+\.?\d*)\s*分/;
   const match = text.match(regex);
 
   if (match) {
-    return parseInt(match[1] || match[2]);
+    const score = parseFloat(match[1] || match[2] || match[3]);
+    // 确保评分在 0-10 范围内
+    if (score >= 0 && score <= 10) {
+      return Math.round(score * 10) / 10; // 保留一位小数
+    }
   }
 
   return null;
