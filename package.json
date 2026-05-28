@@ -1,0 +1,25 @@
+{
+  "name": "ai-pr-reviewer",
+  "version": "1.0.0",
+  "description": "AI PR Review 助手 - 智能代码评审工具",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js"
+  },
+  "keywords": [
+    "ai",
+    "code-review",
+    "github",
+    "pull-request"
+  ],
+  "author": "张顺",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "marked": "^11.1.1"
+  }
+}
