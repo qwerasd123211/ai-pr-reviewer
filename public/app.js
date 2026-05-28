@@ -1,19 +1,112 @@
-// 全局变量
+// ============================================
+// CODEX // AI PR Analyzer
+// ============================================
+
+// 全局状态
 let isAnalyzing = false;
 
-/**
- * 分析PR
- */
-async function analyzePR() {
-  const prUrl = document.getElementById('prUrl').value.trim();
+// DOM 元素
+const elements = {
+  prUrl: null,
+  analyzeBtn: null,
+  progressSection: null,
+  progressFill: null,
+  progressMessage: null,
+  progressPercent: null,
+  errorSection: null,
+  errorMessage: null,
+  resultSection: null,
+  prInfo: null,
+  scoreDisplay: null,
+  prSummary: null,
+  risksList: null,
+  suggestions: null,
+  conclusion: null,
+  rawAnalysis: null
+};
 
+// ============================================
+// 初始化
+// ============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  initElements();
+  initEventListeners();
+  initTypingEffect();
+});
+
+function initElements() {
+  elements.prUrl = document.getElementById('prUrl');
+  elements.analyzeBtn = document.getElementById('analyzeBtn');
+  elements.progressSection = document.getElementById('progressSection');
+  elements.progressFill = document.getElementById('progressFill');
+  elements.progressMessage = document.getElementById('progressMessage');
+  elements.progressPercent = document.getElementById('progressPercent');
+  elements.errorSection = document.getElementById('errorSection');
+  elements.errorMessage = document.getElementById('errorMessage');
+  elements.resultSection = document.getElementById('resultSection');
+  elements.prInfo = document.getElementById('prInfo');
+  elements.scoreDisplay = document.getElementById('scoreDisplay');
+  elements.prSummary = document.getElementById('prSummary');
+  elements.risksList = document.getElementById('risksList');
+  elements.suggestions = document.getElementById('suggestions');
+  elements.conclusion = document.getElementById('conclusion');
+  elements.rawAnalysis = document.getElementById('rawAnalysis');
+}
+
+function initEventListeners() {
+  // 输入框回车事件
+  elements.prUrl.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      analyzePR();
+    }
+  });
+
+  // 输入框聚焦效果
+  elements.prUrl.addEventListener('focus', () => {
+    elements.prUrl.parentElement.classList.add('focused');
+  });
+
+  elements.prUrl.addEventListener('blur', () => {
+    elements.prUrl.parentElement.classList.remove('focused');
+  });
+}
+
+function initTypingEffect() {
+  const tagline = document.querySelector('.tagline-text');
+  if (!tagline) return;
+
+  const text = tagline.textContent;
+  tagline.textContent = '';
+
+  let i = 0;
+  const typeInterval = setInterval(() => {
+    if (i < text.length) {
+      tagline.textContent += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(typeInterval);
+    }
+  }, 50);
+}
+
+// ============================================
+// 主要功能
+// ============================================
+
+async function analyzePR() {
+  const prUrl = elements.prUrl.value.trim();
+
+  // 验证输入
   if (!prUrl) {
-    showError('请输入PR链接');
+    showError('ERROR: 请输入 PR 链接');
+    shakeInput();
     return;
   }
 
   if (!isValidPrUrl(prUrl)) {
-    showError('请输入有效的GitHub PR链接，格式：https://github.com/owner/repo/pull/123');
+    showError('ERROR: 无效的 GitHub PR 链接格式');
+    shakeInput();
     return;
   }
 
@@ -23,7 +116,7 @@ async function analyzePR() {
 
   isAnalyzing = true;
 
-  // 隐藏之前的结果和错误
+  // 隐藏之前的区域
   hideAllSections();
   showProgress();
   updateButtonState(true);
@@ -42,7 +135,7 @@ async function analyzePR() {
       throw new Error(error.error || '分析失败');
     }
 
-    // 处理SSE流
+    // 处理 SSE 流
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
@@ -69,23 +162,25 @@ async function analyzePR() {
     }
 
   } catch (error) {
-    showError(error.message);
+    showError(`ERROR: ${error.message}`);
   } finally {
     isAnalyzing = false;
     updateButtonState(false);
   }
 }
 
-/**
- * 验证PR链接格式
- */
+// ============================================
+// 验证函数
+// ============================================
+
 function isValidPrUrl(url) {
   return /github\.com\/[^\/]+\/[^\/]+\/pull\/\d+/.test(url);
 }
 
-/**
- * 处理SSE消息
- */
+// ============================================
+// SSE 消息处理
+// ============================================
+
 function handleSSEMessage(data) {
   switch (data.type) {
     case 'progress':
@@ -95,147 +190,165 @@ function handleSSEMessage(data) {
       showResult(data.data);
       break;
     case 'error':
-      showError(data.message);
+      showError(`ERROR: ${data.message}`);
       break;
   }
 }
 
-/**
- * 显示进度
- */
+// ============================================
+// UI 更新函数
+// ============================================
+
 function showProgress() {
-  document.getElementById('progressSection').style.display = 'block';
-  updateProgress('准备中...', 0);
+  elements.progressSection.classList.remove('hidden');
+  updateProgress('Initializing scanner...', 0);
 }
 
-/**
- * 更新进度
- */
 function updateProgress(message, progress) {
-  document.getElementById('progressFill').style.width = `${progress}%`;
-  document.getElementById('progressMessage').textContent = message;
+  elements.progressFill.style.width = `${progress}%`;
+  elements.progressMessage.textContent = message;
+  elements.progressPercent.textContent = `${progress}%`;
 }
 
-/**
- * 隐藏所有区域
- */
 function hideAllSections() {
-  document.getElementById('progressSection').style.display = 'none';
-  document.getElementById('errorSection').style.display = 'none';
-  document.getElementById('resultSection').style.display = 'none';
+  elements.progressSection.classList.add('hidden');
+  elements.errorSection.classList.add('hidden');
+  elements.resultSection.classList.add('hidden');
 }
 
-/**
- * 显示错误
- */
 function showError(message) {
   hideAllSections();
-  document.getElementById('errorMessage').textContent = message;
-  document.getElementById('errorSection').style.display = 'block';
+  elements.errorMessage.textContent = message;
+  elements.errorSection.classList.remove('hidden');
+
+  // 滚动到错误区域
+  elements.errorSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-/**
- * 更新按钮状态
- */
 function updateButtonState(disabled) {
-  const btn = document.getElementById('analyzeBtn');
+  const btn = elements.analyzeBtn;
   btn.disabled = disabled;
-  btn.querySelector('.btn-text').style.display = disabled ? 'none' : 'inline';
-  btn.querySelector('.btn-loading').style.display = disabled ? 'inline' : 'none';
+
+  const btnText = btn.querySelector('.btn-text');
+  const btnLoading = btn.querySelector('.btn-loading');
+  const btnIcon = btn.querySelector('.btn-icon');
+
+  if (disabled) {
+    btnText.style.display = 'none';
+    btnIcon.style.display = 'none';
+    btnLoading.style.display = 'inline';
+  } else {
+    btnText.style.display = 'inline';
+    btnIcon.style.display = 'inline';
+    btnLoading.style.display = 'none';
+  }
 }
 
-/**
- * 显示结果
- */
+function shakeInput() {
+  const container = elements.prUrl.parentElement;
+  container.classList.add('shake');
+  setTimeout(() => {
+    container.classList.remove('shake');
+  }, 500);
+}
+
+// ============================================
+// 结果展示
+// ============================================
+
 function showResult(data) {
   hideAllSections();
 
-  // 显示PR信息
+  // 显示 PR 信息
   displayPrInfo(data.prInfo, data.filesCount);
 
   // 显示评分
   displayScore(data.analysis.score);
 
   // 显示变更总结
-  document.getElementById('prSummary').innerHTML = formatMarkdown(data.analysis.summary);
+  elements.prSummary.innerHTML = formatMarkdown(data.analysis.summary);
 
   // 显示风险代码
   displayRisks(data.analysis.risks);
 
-  // 显示Review建议
-  document.getElementById('suggestions').innerHTML = formatMarkdown(data.analysis.suggestions);
+  // 显示 Review 建议
+  elements.suggestions.innerHTML = formatMarkdown(data.analysis.suggestions);
 
   // 显示总体评价
-  document.getElementById('conclusion').innerHTML = formatMarkdown(data.analysis.conclusion);
+  elements.conclusion.innerHTML = formatMarkdown(data.analysis.conclusion);
 
   // 显示原始分析
-  document.getElementById('rawAnalysis').textContent = data.rawAnalysis;
+  elements.rawAnalysis.textContent = data.rawAnalysis;
 
   // 显示结果区域
-  document.getElementById('resultSection').style.display = 'flex';
+  elements.resultSection.classList.remove('hidden');
 
   // 滚动到结果
-  document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => {
+    elements.resultSection.scrollIntoView({ behavior: 'smooth' });
+  }, 100);
 }
 
-/**
- * 显示PR信息
- */
+// ============================================
+// PR 信息展示
+// ============================================
+
 function displayPrInfo(prInfo, filesCount) {
   const prInfoHtml = `
     <div class="pr-info-item">
-      <label>标题</label>
+      <label>TITLE</label>
       <value>${escapeHtml(prInfo.title)}</value>
     </div>
     <div class="pr-info-item">
-      <label>作者</label>
+      <label>AUTHOR</label>
       <value>${escapeHtml(prInfo.author)}</value>
     </div>
     <div class="pr-info-item">
-      <label>状态</label>
-      <value>${prInfo.state === 'open' ? '进行中' : '已关闭'}</value>
+      <label>STATUS</label>
+      <value class="${prInfo.state === 'open' ? 'status-active' : ''}">${prInfo.state === 'open' ? 'OPEN' : 'CLOSED'}</value>
     </div>
     <div class="pr-info-item">
-      <label>变更文件数</label>
-      <value>${filesCount} 个文件</value>
+      <label>FILES CHANGED</label>
+      <value>${filesCount}</value>
     </div>
     <div class="pr-info-item">
-      <label>新增行数</label>
-      <value style="color: #4caf50">+${prInfo.additions}</value>
+      <label>ADDITIONS</label>
+      <value style="color: var(--neon-green)">+${prInfo.additions}</value>
     </div>
     <div class="pr-info-item">
-      <label>删除行数</label>
-      <value style="color: #f44336">-${prInfo.deletions}</value>
+      <label>DELETIONS</label>
+      <value style="color: var(--red)">-${prInfo.deletions}</value>
     </div>
   `;
 
-  document.getElementById('prInfo').innerHTML = prInfoHtml;
+  elements.prInfo.innerHTML = prInfoHtml;
 }
 
-/**
- * 显示评分
- */
+// ============================================
+// 评分展示
+// ============================================
+
 function displayScore(score) {
   if (!score) {
-    document.getElementById('scoreDisplay').innerHTML = '<p>未找到评分信息</p>';
+    elements.scoreDisplay.innerHTML = '<p style="color: var(--text-dim)">Score not available</p>';
     return;
   }
 
   let scoreClass = 'average';
-  let scoreLabel = '一般';
+  let scoreLabel = 'AVERAGE';
 
   if (score >= 8) {
     scoreClass = 'excellent';
-    scoreLabel = '优秀';
+    scoreLabel = 'EXCELLENT';
   } else if (score >= 6) {
     scoreClass = 'good';
-    scoreLabel = '良好';
+    scoreLabel = 'GOOD';
   } else if (score >= 4) {
     scoreClass = 'average';
-    scoreLabel = '一般';
+    scoreLabel = 'AVERAGE';
   } else {
     scoreClass = 'poor';
-    scoreLabel = '较差';
+    scoreLabel = 'POOR';
   }
 
   const scoreHtml = `
@@ -244,19 +357,28 @@ function displayScore(score) {
       <div class="score-bar-bg">
         <div class="score-bar-fill ${scoreClass}" style="width: ${score * 10}%"></div>
       </div>
-      <div class="score-label">${scoreLabel} (满分10分)</div>
+      <div class="score-label">${scoreLabel} (MAX: 10)</div>
     </div>
   `;
 
-  document.getElementById('scoreDisplay').innerHTML = scoreHtml;
+  elements.scoreDisplay.innerHTML = scoreHtml;
 }
 
-/**
- * 显示风险代码
- */
+// ============================================
+// 风险代码展示
+// ============================================
+
 function displayRisks(risks) {
   if (!risks || risks.length === 0) {
-    document.getElementById('risksList').innerHTML = '<p style="color: #666;">未发现明显风险代码</p>';
+    elements.risksList.innerHTML = `
+      <div class="risk-item low">
+        <div class="risk-header">
+          <span class="risk-type security">CLEAR</span>
+          <span class="risk-severity low">NO THREATS</span>
+        </div>
+        <div class="risk-description">未发现明显风险代码</div>
+      </div>
+    `;
     return;
   }
 
@@ -279,7 +401,7 @@ function displayRisks(risks) {
     }
 
     return `
-      <div class="risk-item ${severity}">
+      <div class="risk-item ${severity}" style="animation-delay: ${index * 0.1}s">
         <div class="risk-header">
           <span class="risk-type ${type}">${getTypeLabel(type)}</span>
           <span class="risk-severity ${severity}">${getSeverityLabel(severity)}</span>
@@ -289,57 +411,57 @@ function displayRisks(risks) {
     `;
   }).join('');
 
-  document.getElementById('risksList').innerHTML = risksHtml;
+  elements.risksList.innerHTML = risksHtml;
 }
 
-/**
- * 获取类型标签
- */
 function getTypeLabel(type) {
   const labels = {
-    security: '安全',
-    performance: '性能',
-    logic: '逻辑',
-    maintainability: '可维护性'
+    security: 'SECURITY',
+    performance: 'PERFORMANCE',
+    logic: 'LOGIC',
+    maintainability: 'MAINTAINABILITY'
   };
-  return labels[type] || type;
+  return labels[type] || type.toUpperCase();
 }
 
-/**
- * 获取严重程度标签
- */
 function getSeverityLabel(severity) {
   const labels = {
-    high: '高风险',
-    medium: '中风险',
-    low: '低风险'
+    high: 'HIGH RISK',
+    medium: 'MEDIUM RISK',
+    low: 'LOW RISK'
   };
-  return labels[severity] || severity;
+  return labels[severity] || severity.toUpperCase();
 }
 
-/**
- * 切换原始分析显示
- */
-function toggleRawAnalysis() {
-  const rawAnalysis = document.getElementById('rawAnalysis');
-  const btn = rawAnalysis.previousElementSibling;
+// ============================================
+// 原始分析切换
+// ============================================
 
-  if (rawAnalysis.style.display === 'none') {
-    rawAnalysis.style.display = 'block';
-    btn.textContent = '收起';
+function toggleRawAnalysis() {
+  const rawAnalysis = elements.rawAnalysis;
+  const toggleBtn = rawAnalysis.previousElementSibling;
+  const toggleText = toggleBtn.querySelector('.toggle-text');
+  const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+
+  if (rawAnalysis.classList.contains('hidden')) {
+    rawAnalysis.classList.remove('hidden');
+    toggleText.textContent = 'COLLAPSE';
+    toggleIcon.style.transform = 'rotate(180deg)';
   } else {
-    rawAnalysis.style.display = 'none';
-    btn.textContent = '展开查看';
+    rawAnalysis.classList.add('hidden');
+    toggleText.textContent = 'EXPAND';
+    toggleIcon.style.transform = 'rotate(0deg)';
   }
 }
 
-/**
- * 格式化Markdown
- */
+// ============================================
+// Markdown 格式化
+// ============================================
+
 function formatMarkdown(text) {
   if (!text) return '';
 
-  // 简单的Markdown格式化
+  // 简单的 Markdown 格式化
   return text
     // 标题
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -371,27 +493,40 @@ function formatMarkdown(text) {
     .replace(/(<\/pre>)<\/p>/g, '$1');
 }
 
-/**
- * HTML转义
- */
+// ============================================
+// 工具函数
+// ============================================
+
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
-/**
- * 页面加载完成后的初始化
- */
-document.addEventListener('DOMContentLoaded', () => {
-  // 添加输入框回车事件
-  document.getElementById('prUrl').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      analyzePR();
-    }
-  });
+// ============================================
+// CSS 动态注入（抖动效果）
+// ============================================
 
-  // 示例PR链接（可选）
-  const examplePr = 'https://github.com/facebook/react/pull/12345';
-  document.getElementById('prUrl').placeholder = `请输入GitHub PR链接，例如：${examplePr}`;
-});
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .focused {
+    border-color: var(--neon-green) !important;
+    box-shadow: 0 0 20px var(--neon-green-glow) !important;
+  }
+
+  .status-active {
+    color: var(--neon-green) !important;
+    text-shadow: 0 0 8px var(--neon-green-glow);
+  }
+`;
+document.head.appendChild(style);
