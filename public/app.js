@@ -190,7 +190,7 @@ function handleSSEMessage(data) {
       showResult(data.data);
       break;
     case 'error':
-      showError(`ERROR: ${data.message}`);
+      showError(`错误: ${data.message}`);
       break;
   }
 }
@@ -201,7 +201,7 @@ function handleSSEMessage(data) {
 
 function showProgress() {
   elements.progressSection.classList.remove('hidden');
-  updateProgress('Initializing scanner...', 0);
+  updateProgress('初始化扫描器...', 0);
 }
 
 function updateProgress(message, progress) {
@@ -296,27 +296,27 @@ function showResult(data) {
 function displayPrInfo(prInfo, filesCount) {
   const prInfoHtml = `
     <div class="pr-info-item">
-      <label>TITLE</label>
+      <label>标题</label>
       <value>${escapeHtml(prInfo.title)}</value>
     </div>
     <div class="pr-info-item">
-      <label>AUTHOR</label>
+      <label>作者</label>
       <value>${escapeHtml(prInfo.author)}</value>
     </div>
     <div class="pr-info-item">
-      <label>STATUS</label>
-      <value class="${prInfo.state === 'open' ? 'status-active' : ''}">${prInfo.state === 'open' ? 'OPEN' : 'CLOSED'}</value>
+      <label>状态</label>
+      <value class="${prInfo.state === 'open' ? 'status-active' : ''}">${prInfo.state === 'open' ? '进行中' : '已关闭'}</value>
     </div>
     <div class="pr-info-item">
-      <label>FILES CHANGED</label>
-      <value>${filesCount}</value>
+      <label>变更文件</label>
+      <value>${filesCount} 个</value>
     </div>
     <div class="pr-info-item">
-      <label>ADDITIONS</label>
+      <label>新增行数</label>
       <value style="color: var(--neon-green)">+${prInfo.additions}</value>
     </div>
     <div class="pr-info-item">
-      <label>DELETIONS</label>
+      <label>删除行数</label>
       <value style="color: var(--red)">-${prInfo.deletions}</value>
     </div>
   `;
@@ -330,25 +330,25 @@ function displayPrInfo(prInfo, filesCount) {
 
 function displayScore(score) {
   if (!score) {
-    elements.scoreDisplay.innerHTML = '<p style="color: var(--text-dim)">Score not available</p>';
+    elements.scoreDisplay.innerHTML = '<p style="color: var(--text-dim)">暂无评分</p>';
     return;
   }
 
   let scoreClass = 'average';
-  let scoreLabel = 'AVERAGE';
+  let scoreLabel = '一般';
 
   if (score >= 8) {
     scoreClass = 'excellent';
-    scoreLabel = 'EXCELLENT';
+    scoreLabel = '优秀';
   } else if (score >= 6) {
     scoreClass = 'good';
-    scoreLabel = 'GOOD';
+    scoreLabel = '良好';
   } else if (score >= 4) {
     scoreClass = 'average';
-    scoreLabel = 'AVERAGE';
+    scoreLabel = '一般';
   } else {
     scoreClass = 'poor';
-    scoreLabel = 'POOR';
+    scoreLabel = '较差';
   }
 
   const scoreHtml = `
@@ -357,7 +357,7 @@ function displayScore(score) {
       <div class="score-bar-bg">
         <div class="score-bar-fill ${scoreClass}" style="width: ${score * 10}%"></div>
       </div>
-      <div class="score-label">${scoreLabel} (MAX: 10)</div>
+      <div class="score-label">${scoreLabel} (满分 10 分)</div>
     </div>
   `;
 
@@ -373,8 +373,8 @@ function displayRisks(risks) {
     elements.risksList.innerHTML = `
       <div class="risk-item low">
         <div class="risk-header">
-          <span class="risk-type security">CLEAR</span>
-          <span class="risk-severity low">NO THREATS</span>
+          <span class="risk-type security">安全</span>
+          <span class="risk-severity low">无威胁</span>
         </div>
         <div class="risk-description">未发现明显风险代码</div>
       </div>
@@ -416,21 +416,21 @@ function displayRisks(risks) {
 
 function getTypeLabel(type) {
   const labels = {
-    security: 'SECURITY',
-    performance: 'PERFORMANCE',
-    logic: 'LOGIC',
-    maintainability: 'MAINTAINABILITY'
+    security: '安全',
+    performance: '性能',
+    logic: '逻辑',
+    maintainability: '可维护性'
   };
-  return labels[type] || type.toUpperCase();
+  return labels[type] || type;
 }
 
 function getSeverityLabel(severity) {
   const labels = {
-    high: 'HIGH RISK',
-    medium: 'MEDIUM RISK',
-    low: 'LOW RISK'
+    high: '高风险',
+    medium: '中风险',
+    low: '低风险'
   };
-  return labels[severity] || severity.toUpperCase();
+  return labels[severity] || severity;
 }
 
 // ============================================
@@ -445,11 +445,11 @@ function toggleRawAnalysis() {
 
   if (rawAnalysis.classList.contains('hidden')) {
     rawAnalysis.classList.remove('hidden');
-    toggleText.textContent = 'COLLAPSE';
+    toggleText.textContent = '收起';
     toggleIcon.style.transform = 'rotate(180deg)';
   } else {
     rawAnalysis.classList.add('hidden');
-    toggleText.textContent = 'EXPAND';
+    toggleText.textContent = '展开';
     toggleIcon.style.transform = 'rotate(0deg)';
   }
 }

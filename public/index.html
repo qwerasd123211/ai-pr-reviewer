@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CODEX // AI PR Analyzer</title>
+  <title>CODEX // AI 代码评审助手</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -28,25 +28,25 @@
         </div>
         <div class="logo-text">
           <span class="logo-main">CODEX</span>
-          <span class="logo-sub">// PR ANALYZER</span>
+          <span class="logo-sub">// 代码评审助手</span>
         </div>
         <div class="logo-brackets">]</div>
       </div>
       <div class="header-tagline">
         <span class="tagline-cursor">></span>
-        <span class="tagline-text">AI-POWERED CODE REVIEW SYSTEM v2.0</span>
+        <span class="tagline-text">AI 驱动的智能代码评审系统 v2.0</span>
       </div>
       <div class="header-stats">
         <div class="stat">
-          <span class="stat-label">ENGINE</span>
+          <span class="stat-label">引擎</span>
           <span class="stat-value">CLAUDE-3.5</span>
         </div>
         <div class="stat">
-          <span class="stat-label">STATUS</span>
-          <span class="stat-value status-active">ONLINE</span>
+          <span class="stat-label">状态</span>
+          <span class="stat-value status-active">在线</span>
         </div>
         <div class="stat">
-          <span class="stat-label">ACCURACY</span>
+          <span class="stat-label">准确率</span>
           <span class="stat-value">98.7%</span>
         </div>
       </div>
@@ -56,7 +56,7 @@
     <section class="input-section">
       <div class="section-header">
         <div class="section-icon">>_</div>
-        <h2>TARGET ACQUISITION</h2>
+        <h2>目标获取</h2>
         <div class="section-line"></div>
       </div>
       <div class="input-container">
@@ -75,8 +75,8 @@
               <path d="M21 21l-4.35-4.35"/>
             </svg>
           </span>
-          <span class="btn-text">SCAN</span>
-          <span class="btn-loading">SCANNING...</span>
+          <span class="btn-text">扫描</span>
+          <span class="btn-loading">扫描中...</span>
         </button>
       </div>
       <div class="input-footer">
@@ -95,7 +95,7 @@
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
           </svg>
         </div>
-        <span class="progress-label">ANALYSIS IN PROGRESS</span>
+        <span class="progress-label">分析进行中</span>
       </div>
       <div class="progress-bar">
         <div id="progressFill" class="progress-fill">
@@ -103,7 +103,7 @@
         </div>
       </div>
       <div class="progress-info">
-        <span id="progressMessage" class="progress-message">Initializing scanner...</span>
+        <span id="progressMessage" class="progress-message">初始化扫描器...</span>
         <span id="progressPercent" class="progress-percent">0%</span>
       </div>
     </section>
@@ -118,7 +118,7 @@
             <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <h3>ERROR DETECTED</h3>
+        <h3>检测到错误</h3>
       </div>
       <p id="errorMessage" class="error-message"></p>
       <button class="retry-btn" onclick="analyzePR()">
@@ -126,7 +126,7 @@
           <path d="M1 4v6h6"/>
           <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
         </svg>
-        RETRY
+        重试
       </button>
     </section>
 
@@ -143,8 +143,8 @@
               <path d="M18 9a9 9 0 01-9 9"/>
             </svg>
           </div>
-          <h3>PULL REQUEST METADATA</h3>
-          <div class="card-badge">EXTRACTED</div>
+          <h3>PR 元数据</h3>
+          <div class="card-badge">已提取</div>
         </div>
         <div id="prInfo" class="pr-info"></div>
       </div>
@@ -159,7 +159,7 @@
               <path d="M6 20v-4"/>
             </svg>
           </div>
-          <h3>QUALITY ASSESSMENT</h3>
+          <h3>质量评估</h3>
         </div>
         <div id="scoreDisplay" class="score-display"></div>
       </div>
@@ -175,7 +175,7 @@
               <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
           </div>
-          <h3>CHANGE SUMMARY</h3>
+          <h3>变更总结</h3>
         </div>
         <div id="prSummary" class="content"></div>
       </div>
@@ -190,8 +190,8 @@
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
           </div>
-          <h3>VULNERABILITIES DETECTED</h3>
-          <div class="card-badge warning">ALERT</div>
+          <h3>风险检测</h3>
+          <div class="card-badge warning">警告</div>
         </div>
         <div id="risksList" class="risks-list"></div>
       </div>
@@ -205,7 +205,7 @@
               <circle cx="12" cy="12" r="10"/>
             </svg>
           </div>
-          <h3>RECOMMENDATIONS</h3>
+          <h3>改进建议</h3>
         </div>
         <div id="suggestions" class="content"></div>
       </div>
@@ -220,7 +220,7 @@
               <line x1="12" y1="8" x2="12.01" y2="8"/>
             </svg>
           </div>
-          <h3>FINAL VERDICT</h3>
+          <h3>总体评价</h3>
         </div>
         <div id="conclusion" class="content"></div>
       </div>
@@ -234,9 +234,9 @@
               <polyline points="8,6 2,12 8,18"/>
             </svg>
           </div>
-          <h3>RAW ANALYSIS DATA</h3>
+          <h3>原始分析数据</h3>
           <button class="toggle-btn" onclick="toggleRawAnalysis()">
-            <span class="toggle-text">EXPAND</span>
+            <span class="toggle-text">展开</span>
             <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6,9 12,15 18,9"/>
             </svg>
@@ -250,7 +250,7 @@
     <section class="design-section">
       <div class="section-header">
         <div class="section-icon">>_</div>
-        <h2>SYSTEM ARCHITECTURE</h2>
+        <h2>系统架构</h2>
         <div class="section-line"></div>
       </div>
       <div class="design-grid">
@@ -263,12 +263,12 @@
                 <path d="M12 8h.01"/>
               </svg>
             </div>
-            <h3>NEURAL ENGINE</h3>
+            <h3>神经引擎</h3>
           </div>
           <p>Claude 3.5 Sonnet - 最先进的语言模型，具备深度代码理解能力和精准的问题识别能力。</p>
           <div class="design-stats">
-            <span>Parameters: 175B</span>
-            <span>Context: 200K</span>
+            <span>参数: 175B</span>
+            <span>上下文: 200K</span>
           </div>
         </div>
         <div class="design-card">
@@ -278,12 +278,12 @@
                 <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/>
               </svg>
             </div>
-            <h3>DATA ACQUISITION</h3>
+            <h3>数据获取</h3>
           </div>
           <p>GitHub REST API - 获取 PR 元数据、文件变更和代码差异，结合 PR 描述理解变更意图。</p>
           <div class="design-stats">
-            <span>API: REST v3</span>
-            <span>Auth: OAuth</span>
+            <span>接口: REST v3</span>
+            <span>认证: OAuth</span>
           </div>
         </div>
         <div class="design-card">
@@ -293,12 +293,12 @@
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
             </div>
-            <h3>THREAT DETECTION</h3>
+            <h3>威胁检测</h3>
           </div>
           <p>多维度风险分析：安全漏洞、性能瓶颈、逻辑缺陷、可维护性问题。分级严重程度评估。</p>
           <div class="design-stats">
-            <span>Accuracy: 98.7%</span>
-            <span>False+: <2%</span>
+            <span>准确率: 98.7%</span>
+            <span>误报率: <2%</span>
           </div>
         </div>
         <div class="design-card">
@@ -308,12 +308,12 @@
                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
               </svg>
             </div>
-            <h3>EVOLUTION PATH</h3>
+            <h3>扩展路径</h3>
           </div>
           <p>支持多 AI 模型切换、多平台扩展、自定义规则引擎、团队协作和 CI/CD 集成。</p>
           <div class="design-stats">
-            <span>Models: 3+</span>
-            <span>Platforms: 5+</span>
+            <span>模型: 3+</span>
+            <span>平台: 5+</span>
           </div>
         </div>
       </div>
@@ -332,13 +332,13 @@
           <p class="footer-tech">Node.js + Claude API + GitHub API</p>
         </div>
         <div class="footer-author">
-          <span class="author-label">ENGINEERED BY</span>
+          <span class="author-label">开发者</span>
           <span class="author-name">张顺</span>
         </div>
       </div>
       <div class="footer-line"></div>
       <div class="footer-copyright">
-        <span>© 2026 CODEX SYSTEMS</span>
+        <span>© 2026 CODEX 系统</span>
         <span class="footer-version">v2.0.0</span>
       </div>
     </footer>
