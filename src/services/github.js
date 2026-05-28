@@ -75,12 +75,24 @@ async function getPrFiles(owner, repo, prNumber) {
   const response = await fetch(url, { headers });
 
   if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('PR不存在，请检查链接是否正确');
+    }
+    if (response.status === 403) {
+      throw new Error('API访问受限，请配置GITHUB_TOKEN');
+    }
     throw new Error(`获取文件变更失败: ${response.status}`);
   }
 
-  const files = await response.json();
+  const data = await response.json();
 
-  return files.map(file => ({
+  // 验证返回值是否为数组
+  if (!Array.isArray(data)) {
+    console.error('GitHub API 返回非数组:', data);
+    throw new Error('GitHub API 返回数据格式异常，请稍后重试');
+  }
+
+  return data.map(file => ({
     filename: file.filename,
     status: file.status, // added, removed, modified
     additions: file.additions,
