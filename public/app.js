@@ -295,6 +295,11 @@ function showResult(data) {
   // 显示风险代码
   displayRisks(data.analysis.risks);
 
+  // 显示安全漏洞扫描
+  if (data.security) {
+    displaySecurity(data.security);
+  }
+
   // 显示 Review 建议
   elements.suggestions.innerHTML = formatMarkdown(data.analysis.suggestions);
 
@@ -459,6 +464,107 @@ function getSeverityLabel(severity) {
   };
   return labels[severity] || severity;
 }
+
+// ============================================
+// 安全漏洞展示
+// ============================================
+
+function displaySecurity(security) {
+  if (!security) return;
+
+  const { stats, vulnerabilities, securityScore, summary } = security;
+
+  // 更新徽章
+  const badge = document.getElementById('securityBadge');
+  if (stats.total === 0) {
+    badge.textContent = '安全';
+    badge.className = 'card-badge safe-badge';
+  } else if (stats.critical > 0 || stats.high > 0) {
+    badge.textContent = `发现 ${stats.total} 个漏洞`;
+    badge.className = 'card-badge security-badge';
+  } else {
+    badge.textContent = `发现 ${stats.total} 个问题`;
+    badge.className = 'card-badge warning-badge';
+  }
+
+  // 显示统计摘要
+  const summaryEl = document.getElementById('securitySummary');
+  summaryEl.innerHTML = `
+    <div class="security-stat ${stats.critical > 0 ? 'critical' : 'safe'}">
+      <span class="stat-count">${stats.critical}</span>
+      <span class="stat-label">严重</span>
+    </div>
+    <div class="security-stat ${stats.high > 0 ? 'high' : 'safe'}">
+      <span class="stat-count">${stats.high}</span>
+      <span class="stat-label">高危</span>
+    </div>
+    <div class="security-stat ${stats.medium > 0 ? 'medium' : 'safe'}">
+      <span class="stat-count">${stats.medium}</span>
+      <span class="stat-label">中危</span>
+    </div>
+    <div class="security-stat ${stats.low > 0 ? 'low' : 'safe'}">
+      <span class="stat-count">${stats.low}</span>
+      <span class="stat-label">低危</span>
+    </div>
+  `;
+
+  // 显示漏洞列表
+  const listEl = document.getElementById('securityList');
+  if (vulnerabilities.length === 0) {
+    listEl.innerHTML = `
+      <div class="security-item low">
+        <div class="security-header">
+          <span class="security-type">安全检查</span>
+          <span class="severity-badge low">通过</span>
+        </div>
+        <div class="security-description">未发现安全漏洞，代码安全性良好</div>
+      </div>
+    `;
+  } else {
+    listEl.innerHTML = vulnerabilities.map((vuln, index) => `
+      <div class="security-item ${vuln.severity}" style="animation-delay: ${index * 0.1}s">
+        <div class="security-header">
+          <span class="security-type">${escapeHtml(vuln.name)}</span>
+          <span class="severity-badge ${vuln.severity}">${getSeverityName(vuln.severity)}</span>
+        </div>
+        <div class="security-description">${escapeHtml(vuln.description)}</div>
+        <div class="security-location">
+          文件: ${escapeHtml(vuln.location.file)}:${vuln.location.line}
+        </div>
+        <div class="security-fix">
+          <strong>修复建议：</strong>
+          <p>${escapeHtml(vuln.fix)}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function getSeverityName(severity) {
+  const names = {
+    critical: '严重',
+    high: '高危',
+    medium: '中危',
+    low: '低危'
+  };
+  return names[severity] || severity;
+}
+
+// 添加安全徽章样式
+const securityStyle = document.createElement('style');
+securityStyle.textContent = `
+  .safe-badge {
+    background: rgba(0, 255, 136, 0.1);
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+  }
+  .warning-badge {
+    background: rgba(255, 170, 0, 0.1);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+`;
+document.head.appendChild(securityStyle);
 
 // ============================================
 // 原始分析切换

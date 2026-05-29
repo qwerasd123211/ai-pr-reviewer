@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const githubService = require('./services/github');
 const aiService = require('./services/ai');
+const securityService = require('./services/security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -113,6 +114,15 @@ app.post('/api/analyze', async (req, res) => {
       'AI 分析超时，PR 可能过大，请尝试较小的 PR'
     );
     console.log('[DEBUG] AI分析完成');
+
+    // 安全漏洞检测
+    console.log('[DEBUG] 开始安全漏洞检测...');
+    sendProgress('正在检测安全漏洞...', 95);
+    const securityAnalysis = securityService.analyzeSecurity(files);
+    console.log('[DEBUG] 安全漏洞检测完成，发现:', securityAnalysis.stats.total, '个问题');
+
+    // 合并安全分析结果
+    analysis.security = securityAnalysis;
 
     sendProgress('分析完成！', 100);
 

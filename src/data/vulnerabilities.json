@@ -1,0 +1,291 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-05-30",
+    "sources": ["OWASP Top 10", "CWE", "NVD"],
+    "description": "PRISM 安全漏洞数据库"
+  },
+  "vulnerabilities": {
+    "sql_injection": {
+      "id": "SQL-INJ-001",
+      "name": "SQL注入",
+      "category": "injection",
+      "severity": "critical",
+      "owasp": "A03:2021",
+      "cwe": "CWE-89",
+      "patterns": [
+        "query\\s*\\(\\s*['\"].*\\+",
+        "execute\\s*\\(\\s*['\"].*\\+",
+        "SELECT.*FROM.*WHERE.*=\\s*['\"]\\s*\\+",
+        "INSERT.*INTO.*VALUES.*\\+",
+        "UPDATE.*SET.*=\\s*['\"]\\s*\\+",
+        "DELETE.*FROM.*WHERE.*=\\s*['\"]\\s*\\+"
+      ],
+      "description": "SQL语句拼接用户输入，可能导致数据泄露、数据篡改或数据库被攻击",
+      "impact": "攻击者可以执行任意SQL命令，获取敏感数据，甚至控制整个数据库",
+      "fix": "使用参数化查询或预编译语句，永远不要直接拼接用户输入到SQL语句中",
+      "fixExample": {
+        "bad": "query(\"SELECT * FROM users WHERE id = \" + userId)",
+        "good": "query(\"SELECT * FROM users WHERE id = ?\", [userId])"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/SQL_Injection",
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ]
+    },
+    "xss": {
+      "id": "XSS-001",
+      "name": "跨站脚本攻击",
+      "category": "injection",
+      "severity": "high",
+      "owasp": "A03:2021",
+      "cwe": "CWE-79",
+      "patterns": [
+        "innerHTML\\s*=",
+        "document\\.write\\s*\\(",
+        "\\.html\\s*\\(",
+        "dangerouslySetInnerHTML",
+        "v-html",
+        "eval\\s*\\(",
+        "setTimeout\\s*\\(\\s*['\"]",
+        "setInterval\\s*\\(\\s*['\"]"
+      ],
+      "description": "用户输入未转义直接输出到页面，可能执行恶意脚本",
+      "impact": "攻击者可以窃取用户Cookie、会话令牌，或进行钓鱼攻击",
+      "fix": "对输出内容进行HTML转义，使用安全的DOM操作方法",
+      "fixExample": {
+        "bad": "element.innerHTML = userInput",
+        "good": "element.textContent = userInput"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/xss/",
+        "https://cwe.mitre.org/data/definitions/79.html"
+      ]
+    },
+    "command_injection": {
+      "id": "CMD-INJ-001",
+      "name": "命令注入",
+      "category": "injection",
+      "severity": "critical",
+      "owasp": "A03:2021",
+      "cwe": "CWE-78",
+      "patterns": [
+        "exec\\s*\\(",
+        "spawn\\s*\\(",
+        "execSync\\s*\\(",
+        "child_process",
+        "system\\s*\\(",
+        "passthru\\s*\\(",
+        "shell_exec\\s*\\("
+      ],
+      "description": "将用户输入传递给系统命令执行，可能执行任意系统命令",
+      "impact": "攻击者可以完全控制服务器，执行任意命令",
+      "fix": "避免使用系统命令，如果必须使用，使用参数化方式并严格验证输入",
+      "fixExample": {
+        "bad": "exec('ls ' + userInput)",
+        "good": "execFile('ls', [userInput])"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/Command_Injection",
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ]
+    },
+    "path_traversal": {
+      "id": "PATH-TRAV-001",
+      "name": "路径遍历",
+      "category": "injection",
+      "severity": "high",
+      "owasp": "A01:2021",
+      "cwe": "CWE-22",
+      "patterns": [
+        "readFile\\s*\\(\\s*req\\.",
+        "readFileSync\\s*\\(\\s*req\\.",
+        "\\.\\.\\/\\.\\.\\/",
+        "path\\.join\\s*\\(.*req\\."
+      ],
+      "description": "文件路径包含用户输入，可能访问敏感文件",
+      "impact": "攻击者可以读取服务器上的任意文件，包括配置文件、源代码等",
+      "fix": "验证和过滤文件路径，使用白名单限制可访问的目录",
+      "fixExample": {
+        "bad": "readFile(req.query.file)",
+        "good": "readFile(path.join(allowedDir, basename(req.query.file)))"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/Path_Traversal",
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ]
+    },
+    "hardcoded_credentials": {
+      "id": "CRED-HARD-001",
+      "name": "硬编码凭证",
+      "category": "sensitive_data",
+      "severity": "high",
+      "owasp": "A02:2021",
+      "cwe": "CWE-798",
+      "patterns": [
+        "password\\s*=\\s*['\"][^'\"]+['\"]",
+        "api_key\\s*=\\s*['\"][^'\"]+['\"]",
+        "secret\\s*=\\s*['\"][^'\"]+['\"]",
+        "token\\s*=\\s*['\"][^'\"]+['\"]",
+        "apiKey\\s*=\\s*['\"][^'\"]+['\"]"
+      ],
+      "description": "密码或API密钥直接写在代码中",
+      "impact": "敏感信息泄露，可能被恶意利用",
+      "fix": "使用环境变量或配置文件存储敏感信息，永远不要提交到代码仓库",
+      "fixExample": {
+        "bad": "const apiKey = 'sk-1234567890'",
+        "good": "const apiKey = process.env.API_KEY"
+      },
+      "references": [
+        "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information"
+      ]
+    },
+    "weak_crypto": {
+      "id": "CRYPTO-WEAK-001",
+      "name": "弱加密算法",
+      "category": "sensitive_data",
+      "severity": "medium",
+      "owasp": "A02:2021",
+      "cwe": "CWE-327",
+      "patterns": [
+        "md5\\s*\\(",
+        "sha1\\s*\\(",
+        "createHash\\s*\\(\\s*['\"]md5",
+        "createHash\\s*\\(\\s*['\"]sha1",
+        "DES\\s*\\(",
+        "des\\s*\\("
+      ],
+      "description": "使用了已知不安全的加密算法",
+      "impact": "加密数据可能被破解，导致敏感信息泄露",
+      "fix": "使用更强的加密算法如SHA-256、AES-256",
+      "fixExample": {
+        "bad": "hash = md5(password)",
+        "good": "hash = bcrypt.hashSync(password, 10)"
+      },
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ]
+    },
+    "csrf": {
+      "id": "CSRF-001",
+      "name": "跨站请求伪造",
+      "category": "authentication",
+      "severity": "medium",
+      "owasp": "A01:2021",
+      "cwe": "CWE-352",
+      "patterns": [
+        "fetch\\s*\\(.*method.*POST",
+        "\\.post\\s*\\(",
+        "axios\\.post\\s*\\("
+      ],
+      "description": "未验证请求来源，可能被恶意网站利用",
+      "impact": "攻击者可以冒充用户执行操作",
+      "fix": "添加CSRF Token验证，检查Referer头",
+      "fixExample": {
+        "bad": "fetch('/api/transfer', { method: 'POST' })",
+        "good": "fetch('/api/transfer', { method: 'POST', headers: { 'X-CSRF-Token': token } })"
+      },
+      "references": [
+        "https://owasp.org/www-community/attacks/csrf",
+        "https://cwe.mitre.org/data/definitions/352.html"
+      ]
+    },
+    "open_redirect": {
+      "id": "REDIRECT-001",
+      "name": "开放重定向",
+      "category": "validation",
+      "severity": "medium",
+      "owasp": "A01:2021",
+      "cwe": "CWE-601",
+      "patterns": [
+        "redirect\\s*\\(\\s*req\\.",
+        "window\\.location\\s*=\\s*req\\.",
+        "location\\.href\\s*=\\s*req\\."
+      ],
+      "description": "重定向URL包含用户输入，可能被用于钓鱼攻击",
+      "impact": "攻击者可以诱导用户访问恶意网站",
+      "fix": "验证重定向URL，只允许白名单中的域名",
+      "fixExample": {
+        "bad": "redirect(req.query.url)",
+        "good": "redirect(allowedDomains.includes(url) ? url : '/')"
+      },
+      "references": [
+        "https://cwe.mitre.org/data/definitions/601.html"
+      ]
+    },
+    "nosql_injection": {
+      "id": "NOSQL-INJ-001",
+      "name": "NoSQL注入",
+      "category": "injection",
+      "severity": "high",
+      "owasp": "A03:2021",
+      "cwe": "CWE-943",
+      "patterns": [
+        "\\$where\\s*:",
+        "\\$regex\\s*:",
+        "findOne\\s*\\(\\s*req\\.",
+        "find\\s*\\(\\s*req\\."
+      ],
+      "description": "NoSQL查询拼接用户输入，可能执行恶意查询",
+      "impact": "攻击者可以绕过认证，获取未授权数据",
+      "fix": "验证输入类型，使用MongoDB的查询参数化",
+      "fixExample": {
+        "bad": "db.find({ username: req.body.username })",
+        "good": "db.find({ username: sanitize(req.body.username) })"
+      },
+      "references": [
+        "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.6-Testing_for_NoSQL_Injection"
+      ]
+    },
+    "sensitive_data_exposure": {
+      "id": "DATA-EXPOSE-001",
+      "name": "敏感数据暴露",
+      "category": "sensitive_data",
+      "severity": "high",
+      "owasp": "A02:2021",
+      "cwe": "CWE-200",
+      "patterns": [
+        "console\\.log\\s*\\(.*password",
+        "console\\.log\\s*\\(.*token",
+        "console\\.log\\s*\\(.*secret",
+        "res\\.json\\s*\\(.*password"
+      ],
+      "description": "敏感信息被记录到日志或返回给客户端",
+      "impact": "敏感信息泄露，可能被攻击者利用",
+      "fix": "避免记录敏感信息，返回数据时过滤敏感字段",
+      "fixExample": {
+        "bad": "console.log('User:', user)",
+        "good": "console.log('User:', { id: user.id, name: user.name })"
+      },
+      "references": [
+        "https://cwe.mitre.org/data/definitions/200.html"
+      ]
+    }
+  },
+  "severityLevels": {
+    "critical": {
+      "name": "严重",
+      "color": "#ff0000",
+      "score": 10,
+      "description": "可能导致系统被完全控制"
+    },
+    "high": {
+      "name": "高危",
+      "color": "#ff4444",
+      "score": 7,
+      "description": "可能导致数据泄露或服务中断"
+    },
+    "medium": {
+      "name": "中危",
+      "color": "#ffaa00",
+      "score": 4,
+      "description": "可能存在安全风险"
+    },
+    "low": {
+      "name": "低危",
+      "color": "#4caf50",
+      "score": 1,
+      "description": "安全风险较低"
+    }
+  }
+}
