@@ -1,5 +1,5 @@
 // ============================================
-// CODEX // AI PR Analyzer
+// PRISM // AI 代码评审助手
 // ============================================
 
 // 全局状态
@@ -163,7 +163,7 @@ async function analyzePR() {
     }
 
   } catch (error) {
-    showError(`ERROR: ${error.message}`);
+    showError(error.message);
   } finally {
     isAnalyzing = false;
     updateButtonState(false);
@@ -227,6 +227,12 @@ function showError(message) {
 
   // 滚动到错误区域
   elements.errorSection.scrollIntoView({ behavior: 'smooth' });
+
+  // 添加重试按钮事件
+  const retryBtn = elements.errorSection.querySelector('.retry-btn');
+  if (retryBtn) {
+    retryBtn.onclick = () => analyzePR();
+  }
 }
 
 function updateButtonState(disabled) {
@@ -263,11 +269,18 @@ function shakeInput() {
 // 全局存储分析数据（用于导出）
 let currentAnalysisData = null;
 
+// 历史记录存储
+const HISTORY_KEY = 'prism_analysis_history';
+const MAX_HISTORY = 10;
+
 function showResult(data) {
   hideAllSections();
 
   // 保存当前分析数据
   currentAnalysisData = data;
+
+  // 保存到历史记录
+  saveToHistory(data);
 
   // 显示 PR 信息
   displayPrInfo(data.prInfo, data.filesCount);
@@ -634,7 +647,7 @@ ${f.fixedCode}
     : '无修复建议'}
 
 ---
-*由 CODEX AI 代码评审助手生成*
+*由 PRISM AI 代码评审助手生成*
 `;
 
   return md;
@@ -647,8 +660,11 @@ ${f.fixedCode}
 function formatMarkdown(text) {
   if (!text) return '';
 
+  // 先转义 HTML，防止 XSS
+  let safeText = escapeHtml(text);
+
   // 简单的 Markdown 格式化
-  return text
+  return safeText
     // 标题
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
     .replace(/^## (.*$)/gm, '<h2>$1</h2>')
@@ -687,6 +703,47 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ============================================
+// 历史记录功能
+// ============================================
+
+function saveToHistory(data) {
+  try {
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+    // 添加新记录
+    history.unshift({
+      url: elements.prUrl.value,
+      title: data.prInfo.title,
+      author: data.prInfo.author,
+      score: data.analysis.score,
+      analyzedAt: data.analyzedAt
+    });
+
+    // 限制记录数量
+    if (history.length > MAX_HISTORY) {
+      history = history.slice(0, MAX_HISTORY);
+    }
+
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch (e) {
+    console.error('保存历史记录失败:', e);
+  }
+}
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function loadFromHistory(url) {
+  elements.prUrl.value = url;
+  analyzePR();
 }
 
 // ============================================
