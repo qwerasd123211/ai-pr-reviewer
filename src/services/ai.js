@@ -292,26 +292,61 @@ function extractRisks(text) {
  * 提取修复代码
  */
 function extractFixes(text) {
-  const fixesSection = extractSection(text, '一键修复代码');
+  const fixes = [];
 
-  if (fixesSection === '未找到相关分析') {
-    // 尝试从风险识别部分提取修复代码
-    return extractFixesFromRisks(text);
+  // 查找所有修复代码块
+  // 格式: #### 修复 X: 标题 ... 文件: ... 位置: ... 原始代码: ```...``` 修复后代码: ```...``` 修复说明: ...
+  const fixBlocks = text.split(/(?=####\s*修复\s*\d+)/);
+
+  for (const block of fixBlocks) {
+    if (!block.startsWith('####')) continue;
+
+    const fix = {};
+
+    // 提取标题
+    const titleMatch = block.match(/####\s*修复\s*\d+[：:]\s*(.*)/);
+    if (titleMatch) {
+      fix.title = titleMatch[1].trim();
+    }
+
+    // 提取文件
+    const fileMatch = block.match(/\*\*文件[：:]\*\*\s*(.*)/);
+    if (fileMatch) {
+      fix.file = fileMatch[1].trim();
+    }
+
+    // 提取位置
+    const locationMatch = block.match(/\*\*位置[：:]\*\*\s*(.*)/);
+    if (locationMatch) {
+      fix.location = locationMatch[1].trim();
+    }
+
+    // 提取修复说明
+    const explanationMatch = block.match(/\*\*修复说明[：:]\*\*\s*([\s\S]*?)(?=$|####)/);
+    if (explanationMatch) {
+      fix.explanation = explanationMatch[1].trim();
+    }
+
+    // 提取代码块
+    const codeBlocks = block.match(/```[\w]*\n([\s\S]*?)```/g);
+    if (codeBlocks && codeBlocks.length >= 2) {
+      // 第一个是原始代码，第二个是修复后代码
+      fix.originalCode = codeBlocks[0].replace(/```\w*\n/, '').replace(/```$/, '').trim();
+      fix.fixedCode = codeBlocks[1].replace(/```\w*\n/, '').replace(/```$/, '').trim();
+    } else if (codeBlocks && codeBlocks.length === 1) {
+      // 只有一个代码块，作为修复后代码
+      fix.originalCode = '';
+      fix.fixedCode = codeBlocks[0].replace(/```\w*\n/, '').replace(/```$/, '').trim();
+    }
+
+    if (fix.title && fix.fixedCode) {
+      fixes.push(fix);
+    }
   }
 
-  const fixes = [];
-  const fixRegex = /####\s*修复\s*\d+[：:]\s*(.*?)[\s\S]*?文件[：:]\s*(.*?)[\s\S]*?位置[：:]\s*(.*?)[\s\S]*?原始代码[：:]?\s*```[\w]*\n([\s\S]*?)```\s*[\s\S]*?修复后代码[：:]?\s*```[\w]*\n([\s\S]*?)```\s*[\s\S]*?修复说明[：:]\s*(.*?)(?=####|$)/g;
-
-  let match;
-  while ((match = fixRegex.exec(fixesSection)) !== null) {
-    fixes.push({
-      title: match[1].trim(),
-      file: match[2].trim(),
-      location: match[3].trim(),
-      originalCode: match[4].trim(),
-      fixedCode: match[5].trim(),
-      explanation: match[6].trim()
-    });
+  // 如果没有找到修复代码块，尝试从风险识别部分提取
+  if (fixes.length === 0) {
+    return extractFixesFromRisks(text);
   }
 
   return fixes;
@@ -323,6 +358,10 @@ function extractFixes(text) {
 function extractFixesFromRisks(text) {
   const fixes = [];
   const risksSection = extractSection(text, '风险代码识别');
+
+  if (risksSection === '未找到相关分析') {
+    return fixes;
+  }
 
   // 查找代码块
   const codeBlockRegex = /```[\w]*\n([\s\S]*?)```/g;
