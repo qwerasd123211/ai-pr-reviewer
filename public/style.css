@@ -1,5 +1,5 @@
 /* ============================================
-   CODEX // AI PR Analyzer
+   PRISM // AI 代码评审助手
    Terminal Hacker Aesthetic
    ============================================ */
 
@@ -479,6 +479,19 @@ body {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--neon-green);
+}
+
+.progress-estimate {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  animation: fadeInOut 3s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 /* ============================================
