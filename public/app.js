@@ -100,18 +100,19 @@ async function analyzePR() {
 
   // 验证输入
   if (!prUrl) {
-    showError('ERROR: 请输入 PR 链接');
+    showError('请输入 PR 链接');
     shakeInput();
     return;
   }
 
   if (!isValidPrUrl(prUrl)) {
-    showError('ERROR: 无效的 PR 链接格式（支持 GitHub 和 Gitee）');
+    showError('无效的 PR 链接格式（支持 GitHub 和 Gitee）');
     shakeInput();
     return;
   }
 
   if (isAnalyzing) {
+    showError('正在分析中，请稍候...');
     return;
   }
 
