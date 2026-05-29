@@ -163,7 +163,7 @@ async function analyzePR() {
     }
 
   } catch (error) {
-    showError(`ERROR: ${error.message}`);
+    showError(error.message);
   } finally {
     isAnalyzing = false;
     updateButtonState(false);
@@ -227,6 +227,12 @@ function showError(message) {
 
   // 滚动到错误区域
   elements.errorSection.scrollIntoView({ behavior: 'smooth' });
+
+  // 添加重试按钮事件
+  const retryBtn = elements.errorSection.querySelector('.retry-btn');
+  if (retryBtn) {
+    retryBtn.onclick = () => analyzePR();
+  }
 }
 
 function updateButtonState(disabled) {
