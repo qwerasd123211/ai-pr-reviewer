@@ -1,5 +1,5 @@
 // ============================================
-// CODEX // AI PR Analyzer
+// PRISM // AI 代码评审助手
 // ============================================
 
 // 全局状态
@@ -634,7 +634,7 @@ ${f.fixedCode}
     : '无修复建议'}
 
 ---
-*由 CODEX AI 代码评审助手生成*
+*由 PRISM AI 代码评审助手生成*
 `;
 
   return md;
@@ -647,8 +647,11 @@ ${f.fixedCode}
 function formatMarkdown(text) {
   if (!text) return '';
 
+  // 先转义 HTML，防止 XSS
+  let safeText = escapeHtml(text);
+
   // 简单的 Markdown 格式化
-  return text
+  return safeText
     // 标题
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
     .replace(/^## (.*$)/gm, '<h2>$1</h2>')
