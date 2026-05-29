@@ -16,7 +16,7 @@
 
 - **后端**: Node.js + Express
 - **前端**: HTML + CSS + JavaScript（无框架依赖）
-- **AI 引擎**: Claude 3.5 Sonnet (Anthropic)
+- **AI 引擎**: MIMO 2.5
 - **数据源**: GitHub REST API v3
 - **通信**: Server-Sent Events (SSE)
 
@@ -130,12 +130,11 @@ ai-pr-reviewer/
 
 ### 模型选择
 
-使用 **Claude 3.5 Sonnet**，原因：
+使用 **MIMO 2.5**，原因：
 
 - **代码理解能力强** — 能准确理解代码上下文和变更意图
 - **分析质量高** — 输出结构化、专业的评审意见
 - **响应速度快** — 平衡了分析深度和等待时间
-- **上下文窗口大** — 支持分析较大规模的代码变更
 
 ### 上下文获取方式
 

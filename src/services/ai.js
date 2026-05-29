@@ -1,14 +1,14 @@
 const fetch = require('node-fetch');
 
-const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
-const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 /**
  * 分析代码变更
  */
 async function analyzeCode(prDetails, files, onProgress) {
-  if (!CLAUDE_API_KEY) {
-    throw new Error('请配置CLAUDE_API_KEY环境变量');
+  if (!DEEPSEEK_API_KEY) {
+    throw new Error('请配置DEEPSEEK_API_KEY环境变量');
   }
 
   onProgress('正在准备分析...', 60);
@@ -18,18 +18,22 @@ async function analyzeCode(prDetails, files, onProgress) {
 
   onProgress('正在调用AI分析...', 70);
 
-  // 调用Claude API
-  const response = await fetch(CLAUDE_API_URL, {
+  // 调用 DeepSeek API
+  const response = await fetch(DEEPSEEK_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': CLAUDE_API_KEY,
-      'anthropic-version': '2023-06-01'
+      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'deepseek-chat',
       max_tokens: 4096,
+      temperature: 0.7,
       messages: [
+        {
+          role: 'system',
+          content: '你是一个专业的代码评审专家。请直接回答用户的问题，用中文回复。'
+        },
         {
           role: 'user',
           content: prompt
@@ -40,13 +44,13 @@ async function analyzeCode(prDetails, files, onProgress) {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(`Claude API错误: ${error.error?.message || response.status}`);
+    throw new Error(`DeepSeek API错误: ${error.error?.message || response.status}`);
   }
 
   onProgress('正在生成报告...', 90);
 
   const data = await response.json();
-  const analysis = data.content[0].text;
+  const analysis = data.choices[0].message.content;
 
   // 解析AI返回的分析结果
   return parseAnalysis(analysis, prDetails, files);
@@ -119,7 +123,7 @@ ${f.truncatedDiff}
     ? `\n\n注意：由于 PR 较大，已截断 ${truncatedCount} 个文件的分析。以上是变更最大的 ${truncatedFiles.length} 个文件。`
     : '';
 
-  return `你是一个专业的代码评审专家。请分析以下Pull Request的代码变更，并提供详细的评审报告。
+  return `你是一个专业的代码评审专家。请分析以下Pull Request的代码变更，并提供详细的评审报告和修复代码。
 
 ## PR信息
 - 标题: ${prDetails.title}
@@ -148,6 +152,7 @@ ${filesSummary}
 - 所在文件和代码位置
 - 问题描述
 - 修复建议
+- 修复代码（完整的可替换代码）
 
 ### 4. Review建议
 给出整体的改进建议，包括：
@@ -159,7 +164,26 @@ ${filesSummary}
 ### 5. 总体评价
 总结评审结论，是否建议合并，以及需要重点关注的问题。
 
-请确保评审准确、专业、有建设性。${truncationNotice}`;
+### 6. 一键修复代码
+对于每个发现的问题，提供完整的修复代码，格式如下：
+
+#### 修复 1: [问题简述]
+文件: [文件路径]
+位置: [行号范围]
+
+原始代码:
+\`\`\`[语言]
+[原始代码]
+\`\`\`
+
+修复后代码:
+\`\`\`[语言]
+[修复后的完整代码]
+\`\`\`
+
+修复说明: [为什么这样修复]
+
+请确保评审准确、专业、有建设性。修复代码必须是完整可运行的。${truncationNotice}`;
 }
 
 /**
@@ -172,7 +196,8 @@ function parseAnalysis(analysis, prDetails, files) {
     score: extractScore(analysis),
     risks: extractRisks(analysis),
     suggestions: extractSection(analysis, 'Review建议'),
-    conclusion: extractSection(analysis, '总体评价')
+    conclusion: extractSection(analysis, '总体评价'),
+    fixes: extractFixes(analysis)
   };
 
   return {
@@ -261,6 +286,65 @@ function extractRisks(text) {
   }
 
   return risks;
+}
+
+/**
+ * 提取修复代码
+ */
+function extractFixes(text) {
+  const fixesSection = extractSection(text, '一键修复代码');
+
+  if (fixesSection === '未找到相关分析') {
+    // 尝试从风险识别部分提取修复代码
+    return extractFixesFromRisks(text);
+  }
+
+  const fixes = [];
+  const fixRegex = /####\s*修复\s*\d+[：:]\s*(.*?)[\s\S]*?文件[：:]\s*(.*?)[\s\S]*?位置[：:]\s*(.*?)[\s\S]*?原始代码[：:]?\s*```[\w]*\n([\s\S]*?)```\s*[\s\S]*?修复后代码[：:]?\s*```[\w]*\n([\s\S]*?)```\s*[\s\S]*?修复说明[：:]\s*(.*?)(?=####|$)/g;
+
+  let match;
+  while ((match = fixRegex.exec(fixesSection)) !== null) {
+    fixes.push({
+      title: match[1].trim(),
+      file: match[2].trim(),
+      location: match[3].trim(),
+      originalCode: match[4].trim(),
+      fixedCode: match[5].trim(),
+      explanation: match[6].trim()
+    });
+  }
+
+  return fixes;
+}
+
+/**
+ * 从风险识别部分提取修复代码
+ */
+function extractFixesFromRisks(text) {
+  const fixes = [];
+  const risksSection = extractSection(text, '风险代码识别');
+
+  // 查找代码块
+  const codeBlockRegex = /```[\w]*\n([\s\S]*?)```/g;
+  let match;
+  let fixIndex = 1;
+
+  while ((match = codeBlockRegex.exec(risksSection)) !== null) {
+    const code = match[1].trim();
+    if (code.length > 20) { // 忽略太短的代码块
+      fixes.push({
+        title: `修复建议 ${fixIndex}`,
+        file: '见风险识别部分',
+        location: '见风险识别部分',
+        originalCode: '',
+        fixedCode: code,
+        explanation: '根据风险识别建议生成的修复代码'
+      });
+      fixIndex++;
+    }
+  }
+
+  return fixes;
 }
 
 module.exports = {

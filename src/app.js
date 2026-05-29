@@ -37,19 +37,25 @@ function withTimeout(promise, ms, errorMessage) {
 app.post('/api/analyze', async (req, res) => {
   let clientDisconnected = false;
 
-  // 检测客户端断开
-  req.on('close', () => {
+  // 检测客户端断开（使用 res 而不是 req）
+  res.on('close', () => {
+    console.log('[DEBUG] res close event fired');
     clientDisconnected = true;
   });
 
   // 安全写入（检查客户端是否断开）
   const safeWrite = (data) => {
+    console.log('[DEBUG] safeWrite called, clientDisconnected:', clientDisconnected, 'destroyed:', res.destroyed);
     if (!clientDisconnected && !res.destroyed) {
       try {
-        res.write(data);
+        const result = res.write(data);
+        console.log('[DEBUG] res.write result:', result, 'data length:', data.length);
       } catch (e) {
+        console.error('[DEBUG] res.write error:', e.message);
         clientDisconnected = true;
       }
+    } else {
+      console.log('[DEBUG] safeWrite skipped - client disconnected or response destroyed');
     }
   };
 
@@ -77,24 +83,28 @@ app.post('/api/analyze', async (req, res) => {
     };
 
     sendProgress('正在获取PR信息...', 10);
+    console.log('[DEBUG] 开始获取PR详情...平台:', prInfo.platform);
 
     // 获取PR详情（带超时）
     const prDetails = await withTimeout(
-      githubService.getPrDetails(prInfo.owner, prInfo.repo, prInfo.prNumber),
+      githubService.getPrDetails(prInfo.owner, prInfo.repo, prInfo.prNumber, prInfo.platform),
       TIMEOUT.GITHUB_API,
-      'GitHub API 请求超时，请稍后重试'
+      'API 请求超时，请稍后重试'
     );
+    console.log('[DEBUG] PR详情获取成功:', prDetails.title);
     sendProgress('正在获取代码变更...', 30);
 
     // 获取代码变更（带超时）
     const files = await withTimeout(
-      githubService.getPrFiles(prInfo.owner, prInfo.repo, prInfo.prNumber),
+      githubService.getPrFiles(prInfo.owner, prInfo.repo, prInfo.prNumber, prInfo.platform),
       TIMEOUT.GITHUB_API,
-      'GitHub API 请求超时，请稍后重试'
+      'API 请求超时，请稍后重试'
     );
+    console.log('[DEBUG] 文件变更获取成功，文件数:', files.length);
     sendProgress('正在分析代码...', 50);
 
     // AI分析（带超时）
+    console.log('[DEBUG] 开始AI分析...');
     const analysis = await withTimeout(
       aiService.analyzeCode(prDetails, files, (message, progress) => {
         sendProgress(message, progress);
@@ -102,6 +112,7 @@ app.post('/api/analyze', async (req, res) => {
       TIMEOUT.CLAUDE_API,
       'AI 分析超时，PR 可能过大，请尝试较小的 PR'
     );
+    console.log('[DEBUG] AI分析完成');
 
     sendProgress('分析完成！', 100);
 

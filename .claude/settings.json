@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST https://api.mimo.ai/v1/chat/completions -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cmd9k3q3bz1q577787zhq1k3g62w10dpp4j72w03axuykd9a' -d '{\"model\":\"mimo-2.5\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":10}')",
+      "Bash(curl -s -X POST https://api.xiaomimimo.com/v1/chat/completions -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-cmd9k3q3bz1q577787zhq1k3g62w10dpp4j72w03axuykd9a' -d '{\"model\":\"mimo-2.5\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":10}')"
+    ]
+  }
+}

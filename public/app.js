@@ -51,6 +51,7 @@ function initElements() {
   elements.risksList = document.getElementById('risksList');
   elements.suggestions = document.getElementById('suggestions');
   elements.conclusion = document.getElementById('conclusion');
+  elements.fixesList = document.getElementById('fixesList');
   elements.rawAnalysis = document.getElementById('rawAnalysis');
 }
 
@@ -105,7 +106,7 @@ async function analyzePR() {
   }
 
   if (!isValidPrUrl(prUrl)) {
-    showError('ERROR: 无效的 GitHub PR 链接格式');
+    showError('ERROR: 无效的 PR 链接格式（支持 GitHub 和 Gitee）');
     shakeInput();
     return;
   }
@@ -174,7 +175,10 @@ async function analyzePR() {
 // ============================================
 
 function isValidPrUrl(url) {
-  return /github\.com\/[^\/]+\/[^\/]+\/pull\/\d+/.test(url);
+  // GitHub: https://github.com/owner/repo/pull/123
+  // Gitee: https://gitee.com/owner/repo/pulls/123
+  return /github\.com\/[^\/]+\/[^\/]+\/pull\/\d+/.test(url) ||
+         /gitee\.com\/[^\/]+\/[^\/]+\/pulls\/\d+/.test(url);
 }
 
 // ============================================
@@ -256,8 +260,14 @@ function shakeInput() {
 // 结果展示
 // ============================================
 
+// 全局存储分析数据（用于导出）
+let currentAnalysisData = null;
+
 function showResult(data) {
   hideAllSections();
+
+  // 保存当前分析数据
+  currentAnalysisData = data;
 
   // 显示 PR 信息
   displayPrInfo(data.prInfo, data.filesCount);
@@ -276,6 +286,9 @@ function showResult(data) {
 
   // 显示总体评价
   elements.conclusion.innerHTML = formatMarkdown(data.analysis.conclusion);
+
+  // 显示一键修复
+  displayFixes(data.analysis.fixes);
 
   // 显示原始分析
   elements.rawAnalysis.textContent = data.rawAnalysis;
@@ -452,6 +465,179 @@ function toggleRawAnalysis() {
     toggleText.textContent = '展开';
     toggleIcon.style.transform = 'rotate(0deg)';
   }
+}
+
+// ============================================
+// 一键修复展示
+// ============================================
+
+function displayFixes(fixes) {
+  const fixesList = document.getElementById('fixesList');
+  if (!fixesList) return;
+
+  if (!fixes || fixes.length === 0) {
+    fixesList.innerHTML = `
+      <div class="fix-item">
+        <div class="fix-content">
+          <p style="color: var(--text-dim); text-align: center;">未发现需要修复的问题</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  fixesList.innerHTML = fixes.map((fix, index) => `
+    <div class="fix-item" style="animation-delay: ${index * 0.1}s">
+      <div class="fix-header">
+        <span class="fix-title">${escapeHtml(fix.title)}</span>
+        <span class="fix-file">${escapeHtml(fix.file)}</span>
+      </div>
+      <div class="fix-content">
+        <div class="fix-description">${escapeHtml(fix.explanation)}</div>
+        ${fix.originalCode ? `
+        <div class="fix-code-container">
+          <div class="fix-code-block">
+            <span class="fix-code-label">原始代码</span>
+            <pre class="fix-code">${escapeHtml(fix.originalCode)}</pre>
+          </div>
+          <div class="fix-code-block">
+            <span class="fix-code-label">修复后代码</span>
+            <pre class="fix-code">${escapeHtml(fix.fixedCode)}</pre>
+          </div>
+        </div>
+        ` : `
+        <div class="fix-code-block">
+          <span class="fix-code-label">修复代码</span>
+          <pre class="fix-code">${escapeHtml(fix.fixedCode)}</pre>
+        </div>
+        `}
+        <div class="fix-actions">
+          <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(fix.fixedCode).replace(/'/g, "\\'")}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            复制代码
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    // 复制成功提示
+    const btn = event.target.closest('.copy-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> 已复制';
+    btn.style.background = 'var(--neon-green)';
+    btn.style.color = 'var(--bg-dark)';
+
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--neon-green)';
+    }, 2000);
+  }).catch(err => {
+    console.error('复制失败:', err);
+    alert('复制失败，请手动复制');
+  });
+}
+
+// ============================================
+// 导出报告
+// ============================================
+
+function exportMarkdown() {
+  if (!currentAnalysisData) {
+    alert('没有可导出的分析数据');
+    return;
+  }
+
+  const data = currentAnalysisData;
+  const md = generateMarkdownReport(data);
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pr-review-${data.prInfo.title.replace(/[^a-zA-Z0-9]/g, '-')}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportJSON() {
+  if (!currentAnalysisData) {
+    alert('没有可导出的分析数据');
+    return;
+  }
+
+  const data = currentAnalysisData;
+  const json = JSON.stringify(data, null, 2);
+
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pr-review-${data.prInfo.title.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function generateMarkdownReport(data) {
+  const pr = data.prInfo;
+  const analysis = data.analysis;
+
+  let md = `# PR 代码评审报告
+
+## PR 信息
+- **标题**: ${pr.title}
+- **作者**: ${pr.author}
+- **状态**: ${pr.state}
+- **变更文件数**: ${data.filesCount}
+- **新增行数**: +${pr.additions}
+- **删除行数**: -${pr.deletions}
+- **分析时间**: ${new Date(data.analyzedAt).toLocaleString('zh-CN')}
+
+## 代码质量评分
+${analysis.score ? `${analysis.score}/10` : '未评分'}
+
+## 变更总结
+${analysis.summary}
+
+## 风险代码识别
+${analysis.risks && analysis.risks.length > 0
+    ? analysis.risks.map(r => `- ${r.description}`).join('\n')
+    : '未发现明显风险'}
+
+## 改进建议
+${analysis.suggestions}
+
+## 总体评价
+${analysis.conclusion}
+
+## 一键修复建议
+${analysis.fixes && analysis.fixes.length > 0
+    ? analysis.fixes.map(f => `### ${f.title}
+- **文件**: ${f.file}
+- **说明**: ${f.explanation}
+
+\`\`\`
+${f.fixedCode}
+\`\`\`
+`).join('\n')
+    : '无修复建议'}
+
+---
+*由 CODEX AI 代码评审助手生成*
+`;
+
+  return md;
 }
 
 // ============================================
