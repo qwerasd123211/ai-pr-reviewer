@@ -1451,3 +1451,80 @@ body {
   width: 18px;
   height: 18px;
 }
+
+/* ============================================
+   动画效果增强
+   ============================================ */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 滑入动画 */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 滑入动画（右侧） */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 缩放动画 */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.95); }
+}
+
+/* 应用动画到卡片 */
+.result-section .card {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.result-section .card:nth-child(1) { animation-delay: 0.1s; }
+.result-section .card:nth-child(2) { animation-delay: 0.2s; }
+.result-section .card:nth-child(3) { animation-delay: 0.3s; }
+.result-section .card:nth-child(4) { animation-delay: 0.4s; }
+.result-section .card:nth-child(5) { animation-delay: 0.5s; }
+.result-section .card:nth-child(6) { animation-delay: 0.6s; }
+.result-section .card:nth-child(7) { animation-delay: 0.7s; }
+
+/* 输入框聚焦动画 */
+.input-container {
+  transition: all 0.3s ease;
+}
+
+.input-container:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--neon-green-glow);
+}
+
+/* 按钮悬停动画 */
+.input-container button {
+  transition: all 0.3s ease;
+}
+
+.input-container button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--neon-green-glow);
+}
+
+/* 卡片悬停动画 */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
