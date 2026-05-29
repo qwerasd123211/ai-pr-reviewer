@@ -39,15 +39,15 @@
       <div class="header-stats">
         <div class="stat">
           <span class="stat-label">引擎</span>
-          <span class="stat-value">CLAUDE-3.5</span>
+          <span class="stat-value">DEEPSEEK-V4-PRO</span>
         </div>
         <div class="stat">
           <span class="stat-label">状态</span>
           <span class="stat-value status-active">在线</span>
         </div>
         <div class="stat">
-          <span class="stat-label">准确率</span>
-          <span class="stat-value">98.7%</span>
+          <span class="stat-label">版本</span>
+          <span class="stat-value">v2.0</span>
         </div>
       </div>
     </header>
@@ -64,7 +64,7 @@
         <input
           type="text"
           id="prUrl"
-          placeholder="owner/repo/pull/123"
+          placeholder="GitHub 或 Gitee PR 链接"
           autocomplete="off"
           spellcheck="false"
         >
@@ -82,7 +82,7 @@
       <div class="input-footer">
         <span class="footer-hint">
           <span class="hint-icon">?</span>
-          支持公开仓库的 PR 链接 | 私有仓库请配置 GITHUB_TOKEN
+          支持 GitHub 和 Gitee 的 PR 链接 | 私有仓库请配置 Token
         </span>
       </div>
     </section>
@@ -225,6 +225,50 @@
         <div id="conclusion" class="content"></div>
       </div>
 
+      <!-- 一键修复 -->
+      <div class="card fix-card">
+        <div class="card-header">
+          <div class="card-icon fix">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h3>一键修复</h3>
+          <div class="card-badge fix-badge">AI 生成</div>
+        </div>
+        <div id="fixesList" class="fixes-list"></div>
+      </div>
+
+      <!-- 导出报告 -->
+      <div class="card export-card">
+        <div class="card-header">
+          <div class="card-icon export">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <h3>导出报告</h3>
+        </div>
+        <div class="export-buttons">
+          <button class="export-btn" onclick="exportMarkdown()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            导出 Markdown
+          </button>
+          <button class="export-btn" onclick="exportJSON()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16,18 22,12 16,6"/>
+              <polyline points="8,6 2,12 8,18"/>
+            </svg>
+            导出 JSON
+          </button>
+        </div>
+      </div>
+
       <!-- 原始分析 -->
       <div class="card raw-card">
         <div class="card-header">
@@ -263,12 +307,12 @@
                 <path d="M12 8h.01"/>
               </svg>
             </div>
-            <h3>神经引擎</h3>
+            <h3>AI 引擎</h3>
           </div>
-          <p>Claude 3.5 Sonnet - 最先进的语言模型，具备深度代码理解能力和精准的问题识别能力。</p>
+          <p>DeepSeek V4 Pro - 具备深度代码理解能力和精准的问题识别能力。</p>
           <div class="design-stats">
-            <span>参数: 175B</span>
-            <span>上下文: 200K</span>
+            <span>模型: deepseek-chat</span>
+            <span>类型: 大语言模型</span>
           </div>
         </div>
         <div class="design-card">
@@ -297,8 +341,8 @@
           </div>
           <p>多维度风险分析：安全漏洞、性能瓶颈、逻辑缺陷、可维护性问题。分级严重程度评估。</p>
           <div class="design-stats">
-            <span>准确率: 98.7%</span>
-            <span>误报率: <2%</span>
+            <span>分析维度: 4类</span>
+            <span>严重等级: 3级</span>
           </div>
         </div>
         <div class="design-card">
