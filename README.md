@@ -4,7 +4,9 @@
 
 ## 🌐 在线演示
 
-**🔗 在线访问**：https://ai-pr-reviewer-livid.vercel.app
+**🔗 Railway（推荐，国内可访问）**：https://ai-pr-reviewer-production-d51a.up.railway.app/
+
+**🔗 Vercel**：https://ai-pr-reviewer-livid.vercel.app
 
 > 无需安装，直接访问即可体验完整功能！
 
