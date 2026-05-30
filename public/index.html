@@ -38,16 +38,23 @@
       </div>
       <div class="header-stats">
         <div class="stat">
-          <span class="stat-label">引擎</span>
+          <span class="stat-label" data-i18n="engine">引擎</span>
           <span class="stat-value">DEEPSEEK-V4-PRO</span>
         </div>
         <div class="stat">
-          <span class="stat-label">状态</span>
-          <span class="stat-value status-active">在线</span>
+          <span class="stat-label" data-i18n="status">状态</span>
+          <span class="stat-value status-active" data-i18n="online">在线</span>
         </div>
         <div class="stat">
-          <span class="stat-label">版本</span>
+          <span class="stat-label" data-i18n="version">版本</span>
           <span class="stat-value">v2.0</span>
+        </div>
+        <div class="stat language-switcher">
+          <span class="stat-label" data-i18n="language">语言</span>
+          <div class="lang-buttons">
+            <button class="lang-btn active" onclick="i18n.setLanguage('zh')">中文</button>
+            <button class="lang-btn" onclick="i18n.setLanguage('en')">EN</button>
+          </div>
         </div>
       </div>
     </header>
@@ -440,6 +447,13 @@
     </footer>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
+  <script>
+    // 初始化语言
+    document.addEventListener('DOMContentLoaded', () => {
+      i18n.updatePageLanguage();
+    });
+  </script>
 </body>
 </html>

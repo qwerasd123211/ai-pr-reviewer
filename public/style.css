@@ -1811,3 +1811,39 @@ body {
   font-size: 0.75rem;
   color: var(--text-dim);
 }
+
+/* ============================================
+   国际化语言切换样式
+   ============================================ */
+
+.language-switcher {
+  min-width: 120px;
+}
+
+.lang-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.lang-btn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-btn:hover {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+}
+
+.lang-btn.active {
+  background: var(--neon-green);
+  color: var(--bg-dark);
+  border-color: var(--neon-green);
+}
