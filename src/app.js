@@ -157,8 +157,18 @@ app.post('/api/analyze', async (req, res) => {
 
 // 启动服务器（支持 Vercel 和 Railway）
 const PORT = process.env.PORT || 3000;
+console.log('[DEBUG] 正在启动服务器...');
+console.log('[DEBUG] PORT:', PORT);
+console.log('[DEBUG] NODE_ENV:', process.env.NODE_ENV);
+console.log('[DEBUG] 当前目录:', __dirname);
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 AI PR Review 助手运行在 http://0.0.0.0:${PORT}`);
+});
+
+// 错误处理
+app.on('error', (err) => {
+  console.error('[ERROR] 服务器错误:', err);
 });
 
 // 导出 app 供 Vercel 使用
