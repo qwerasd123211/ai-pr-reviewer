@@ -19,18 +19,12 @@ const TIMEOUT = {
 app.use(cors());
 app.use(express.json());
 
-// 静态文件服务（本地开发时使用）
-if (process.env.NODE_ENV !== 'production') {
-  app.use(express.static(path.join(__dirname, '../public')));
-}
+// 静态文件服务（所有环境都启用）
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 路由
 app.get('/', (req, res) => {
-  if (process.env.NODE_ENV === 'production') {
-    res.redirect('/index.html');
-  } else {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-  }
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // 带超时的 Promise 包装
@@ -156,7 +150,7 @@ app.post('/api/analyze', async (req, res) => {
 });
 
 // 启动服务器（支持 Vercel 和 Railway）
-const PORT = process.env.PORT || 3000;
+const PORT = 9000;
 console.log('[DEBUG] 正在启动服务器...');
 console.log('[DEBUG] PORT:', PORT);
 console.log('[DEBUG] NODE_ENV:', process.env.NODE_ENV);
