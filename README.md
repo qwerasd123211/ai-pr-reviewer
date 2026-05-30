@@ -4,11 +4,30 @@
 
 ## 🌐 在线演示
 
-**🔗 Railway（推荐，国内可访问）**：https://ai-pr-reviewer-production-d51a.up.railway.app/
+### 部署平台对比
 
-**🔗 Vercel**：https://ai-pr-reviewer-livid.vercel.app
+| 平台 | 域名 | 网络环境 | GitHub PR | Gitee PR | 推荐场景 |
+|------|------|----------|-----------|----------|----------|
+| **Railway** | [ai-pr-reviewer-production-d51a.up.railway.app](https://ai-pr-reviewer-production-d51a.up.railway.app/) | 国内直连 | ⚠️ 受限 | ✅ 正常 | 国内用户、Gitee 评审 |
+| **Vercel** | [ai-pr-reviewer-livid.vercel.app](https://ai-pr-reviewer-livid.vercel.app) | 需科学上网 | ✅ 正常 | ✅ 正常 | 海外用户、完整功能 |
 
-> 无需安装，直接访问即可体验完整功能！
+### 网络兼容性说明
+
+**Railway 平台**：
+- ✅ 国内网络可直接访问
+- ✅ Gitee PR 评审功能正常
+- ⚠️ GitHub API 访问受限（受部署节点网络策略影响）
+
+**Vercel 平台**：
+- ⚠️ 国内访问需科学上网
+- ✅ GitHub PR 评审功能完整
+- ✅ Gitee PR 评审功能完整
+
+### 选择建议
+
+- **国内用户评审 Gitee PR**：使用 Railway 链接
+- **海外用户或需评审 GitHub PR**：使用 Vercel 链接
+- **完整功能体验**：使用 Vercel 链接（需科学上网）
 
 ## ✨ 功能特性
 
