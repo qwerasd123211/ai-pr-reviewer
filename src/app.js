@@ -7,7 +7,6 @@ const aiService = require('./services/ai');
 const securityService = require('./services/security');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // 超时配置（毫秒）
 const TIMEOUT = {
@@ -19,11 +18,19 @@ const TIMEOUT = {
 // 中间件
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+
+// 静态文件服务（本地开发时使用）
+if (process.env.NODE_ENV !== 'production') {
+  app.use(express.static(path.join(__dirname, '../public')));
+}
 
 // 路由
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  if (process.env.NODE_ENV === 'production') {
+    res.redirect('/index.html');
+  } else {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+  }
 });
 
 // 带超时的 Promise 包装
@@ -148,7 +155,13 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`🚀 AI PR Review 助手运行在 http://localhost:${PORT}`);
-});
+// 本地开发时启动服务器
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 AI PR Review 助手运行在 http://localhost:${PORT}`);
+  });
+}
+
+// 导出 app 供 Vercel 使用
+module.exports = app;
