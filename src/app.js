@@ -155,13 +155,11 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
-// 本地开发时启动服务器
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`🚀 AI PR Review 助手运行在 http://localhost:${PORT}`);
-  });
-}
+// 启动服务器（支持 Vercel 和 Railway）
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 AI PR Review 助手运行在 http://0.0.0.0:${PORT}`);
+});
 
 // 导出 app 供 Vercel 使用
 module.exports = app;
