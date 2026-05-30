@@ -2,6 +2,12 @@
 
 基于 DeepSeek AI 的智能代码评审工具。支持 GitHub 和 Gitee 平台，自动获取代码变更并进行深度分析，输出结构化的 Review 报告。
 
+## 🌐 在线演示
+
+**🔗 在线访问**：https://ai-pr-reviewer-livid.vercel.app
+
+> 无需安装，直接访问即可体验完整功能！
+
 ## ✨ 功能特性
 
 ### 核心功能
