@@ -12,7 +12,7 @@ const githubHeaders = {
 };
 
 if (GITHUB_TOKEN) {
-  githubHeaders['Authorization'] = `token ${GITHUB_TOKEN}`;
+  githubHeaders['Authorization'] = `Bearer ${GITHUB_TOKEN}`;
 }
 
 // Gitee 请求头
