@@ -4,6 +4,12 @@
 
 ## 🌐 在线演示
 
+### 📺 Demo 视频
+
+**[PRISM 工具助手演示](https://www.bilibili.com/video/BV1sHVS6EEZc/)**
+
+> 点击观看完整功能演示视频
+
 ### 部署平台对比
 
 | 平台 | 域名 | 网络环境 | GitHub PR | Gitee PR | 推荐场景 |
