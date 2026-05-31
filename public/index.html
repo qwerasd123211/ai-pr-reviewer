@@ -46,15 +46,8 @@
           <span class="stat-value status-active">在线</span>
         </div>
         <div class="stat">
-          <span class="stat-label" data-i18n="version">版本</span>
+          <span class="stat-label">版本</span>
           <span class="stat-value">v2.0</span>
-        </div>
-        <div class="stat language-switcher">
-          <span class="stat-label" data-i18n="language">语言</span>
-          <div class="lang-buttons">
-            <button class="lang-btn active" onclick="i18n.setLanguage('zh')">中文</button>
-            <button class="lang-btn" onclick="i18n.setLanguage('en')">EN</button>
-          </div>
         </div>
       </div>
     </header>
@@ -63,7 +56,7 @@
     <section class="input-section">
       <div class="section-header">
         <div class="section-icon">>_</div>
-        <h2 data-i18n="targetAcquisition">目标获取</h2>
+        <h2>目标获取</h2>
         <div class="section-line"></div>
       </div>
       <div class="input-container">
@@ -72,7 +65,7 @@
           type="text"
           id="prUrl"
           placeholder="GitHub 或 Gitee PR 链接"
-          data-i18n-placeholder="inputPlaceholder"
+         
           autocomplete="off"
           spellcheck="false"
         >
@@ -83,14 +76,14 @@
               <path d="M21 21l-4.35-4.35"/>
             </svg>
           </span>
-          <span class="btn-text" data-i18n="scanButton">扫描</span>
-          <span class="btn-loading" data-i18n="scanningButton">扫描中...</span>
+          <span class="btn-text">扫描</span>
+          <span class="btn-loading">扫描中...</span>
         </button>
       </div>
       <div class="input-footer">
         <span class="footer-hint">
           <span class="hint-icon">?</span>
-          <span data-i18n="inputHint">支持 GitHub 和 Gitee 的 PR 链接 | 私有仓库请配置 Token</span>
+          <span>支持 GitHub 和 Gitee 的 PR 链接 | 私有仓库请配置 Token</span>
         </span>
       </div>
     </section>
@@ -103,7 +96,7 @@
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
           </svg>
         </div>
-        <span class="progress-label" data-i18n="analyzing">分析进行中</span>
+        <span class="progress-label">分析进行中</span>
       </div>
       <div class="progress-bar">
         <div id="progressFill" class="progress-fill">
@@ -111,12 +104,12 @@
         </div>
       </div>
       <div class="progress-info">
-        <span id="progressMessage" class="progress-message" data-i18n="initializing">初始化扫描器...</span>
+        <span id="progressMessage" class="progress-message">初始化扫描器...</span>
         <span id="progressPercent" class="progress-percent">0%</span>
       </div>
       <!-- 预估时间提示 -->
       <div class="progress-estimate">
-        <span data-i18n="estimatedTime">预计需要 30-60 秒，请耐心等待...</span>
+        <span>预计需要 30-60 秒，请耐心等待...</span>
       </div>
     </section>
 
@@ -130,7 +123,7 @@
             <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <h3 data-i18n="errorDetected">检测到错误</h3>
+        <h3>检测到错误</h3>
       </div>
       <p id="errorMessage" class="error-message"></p>
       <button class="retry-btn" onclick="analyzePR()">
@@ -138,7 +131,7 @@
           <path d="M1 4v6h6"/>
           <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
         </svg>
-        <span data-i18n="retryButton">重试</span>
+        <span>重试</span>
       </button>
     </section>
 
@@ -155,8 +148,8 @@
               <path d="M18 9a9 9 0 01-9 9"/>
             </svg>
           </div>
-          <h3 data-i18n="prMetadata">PR 元数据</h3>
-          <div class="card-badge" data-i18n="extracted">已提取</div>
+          <h3>PR 元数据</h3>
+          <div class="card-badge">已提取</div>
         </div>
         <div id="prInfo" class="pr-info"></div>
       </div>
@@ -171,7 +164,7 @@
               <path d="M6 20v-4"/>
             </svg>
           </div>
-          <h3 data-i18n="qualityAssessment">质量评估</h3>
+          <h3>质量评估</h3>
         </div>
         <div id="scoreDisplay" class="score-display"></div>
       </div>
@@ -187,7 +180,7 @@
               <line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
           </div>
-          <h3 data-i18n="changeSummary">变更总结</h3>
+          <h3>变更总结</h3>
         </div>
         <div id="prSummary" class="content"></div>
       </div>
@@ -202,8 +195,8 @@
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
           </div>
-          <h3 data-i18n="riskDetection">风险检测</h3>
-          <div class="card-badge warning" data-i18n="warning">警告</div>
+          <h3>风险检测</h3>
+          <div class="card-badge warning">警告</div>
         </div>
         <div id="risksList" class="risks-list"></div>
       </div>
@@ -216,8 +209,8 @@
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
           </div>
-          <h3 data-i18n="securityScan">安全漏洞扫描</h3>
-          <div id="securityBadge" class="card-badge security-badge" data-i18n="scanning">扫描中</div>
+          <h3>安全漏洞扫描</h3>
+          <div id="securityBadge" class="card-badge security-badge">扫描中</div>
         </div>
         <div id="securitySummary" class="security-summary"></div>
         <div id="securityList" class="security-list"></div>
@@ -232,7 +225,7 @@
               <circle cx="12" cy="12" r="10"/>
             </svg>
           </div>
-          <h3 data-i18n="recommendations">改进建议</h3>
+          <h3>改进建议</h3>
         </div>
         <div id="suggestions" class="content"></div>
       </div>
@@ -247,7 +240,7 @@
               <line x1="12" y1="8" x2="12.01" y2="8"/>
             </svg>
           </div>
-          <h3 data-i18n="finalVerdict">总体评价</h3>
+          <h3>总体评价</h3>
         </div>
         <div id="conclusion" class="content"></div>
       </div>
@@ -260,8 +253,8 @@
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
             </svg>
           </div>
-          <h3 data-i18n="oneClickFix">一键修复</h3>
-          <div class="card-badge fix-badge" data-i18n="aiGenerated">AI 生成</div>
+          <h3>一键修复</h3>
+          <div class="card-badge fix-badge">AI 生成</div>
         </div>
         <div id="fixesList" class="fixes-list"></div>
       </div>
@@ -276,7 +269,7 @@
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
           </div>
-          <h3 data-i18n="exportReport">导出报告</h3>
+          <h3>导出报告</h3>
         </div>
         <div class="export-buttons">
           <button class="export-btn" onclick="exportMarkdown()">
@@ -284,14 +277,14 @@
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14,2 14,8 20,8"/>
             </svg>
-            <span data-i18n="exportMarkdown">导出 Markdown</span>
+            <span>导出 Markdown</span>
           </button>
           <button class="export-btn" onclick="exportJSON()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="16,18 22,12 16,6"/>
               <polyline points="8,6 2,12 8,18"/>
             </svg>
-            <span data-i18n="exportJSON">导出 JSON</span>
+            <span>导出 JSON</span>
           </button>
         </div>
       </div>
@@ -305,9 +298,9 @@
               <polyline points="8,6 2,12 8,18"/>
             </svg>
           </div>
-          <h3 data-i18n="rawAnalysisData">原始分析数据</h3>
+          <h3>原始分析数据</h3>
           <button class="toggle-btn" onclick="toggleRawAnalysis()">
-            <span class="toggle-text" data-i18n="expand">展开</span>
+            <span class="toggle-text">展开</span>
             <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6,9 12,15 18,9"/>
             </svg>
@@ -321,31 +314,31 @@
     <section class="guide-section">
       <div class="section-header">
         <div class="section-icon">?</div>
-        <h2 data-i18n="usageGuide">使用说明</h2>
+        <h2>使用说明</h2>
         <div class="section-line"></div>
       </div>
       <div class="guide-grid">
         <div class="guide-card">
           <div class="guide-step">1</div>
-          <h3 data-i18n="step1Title">输入 PR 链接</h3>
-          <p data-i18n="step1Desc">支持 GitHub 和 Gitee 的 PR 链接格式</p>
+          <h3>输入 PR 链接</h3>
+          <p>支持 GitHub 和 Gitee 的 PR 链接格式</p>
           <code>github.com/owner/repo/pull/123</code>
           <code>gitee.com/owner/repo/pulls/123</code>
         </div>
         <div class="guide-card">
           <div class="guide-step">2</div>
-          <h3 data-i18n="step2Title">点击扫描</h3>
-          <p data-i18n="step2Desc">AI 自动分析代码变更，预计 30-60 秒</p>
+          <h3>点击扫描</h3>
+          <p>AI 自动分析代码变更，预计 30-60 秒</p>
         </div>
         <div class="guide-card">
           <div class="guide-step">3</div>
-          <h3 data-i18n="step3Title">查看报告</h3>
-          <p data-i18n="step3Desc">查看评分、风险识别、修复建议</p>
+          <h3>查看报告</h3>
+          <p>查看评分、风险识别、修复建议</p>
         </div>
         <div class="guide-card">
           <div class="guide-step">4</div>
-          <h3 data-i18n="step4Title">导出报告</h3>
-          <p data-i18n="step4Desc">支持 Markdown 和 JSON 格式导出</p>
+          <h3>导出报告</h3>
+          <p>支持 Markdown 和 JSON 格式导出</p>
         </div>
       </div>
     </section>
@@ -354,7 +347,7 @@
     <section class="design-section">
       <div class="section-header">
         <div class="section-icon">>_</div>
-        <h2 data-i18n="systemArchitecture">系统架构</h2>
+        <h2>系统架构</h2>
         <div class="section-line"></div>
       </div>
       <div class="design-grid">
@@ -367,9 +360,9 @@
                 <path d="M12 8h.01"/>
               </svg>
             </div>
-            <h3 data-i18n="aiEngine">AI 引擎</h3>
+            <h3>AI 引擎</h3>
           </div>
-          <p data-i18n="aiEngineDesc">DeepSeek V4 Pro - 具备深度代码理解能力和精准的问题识别能力。</p>
+          <p>DeepSeek V4 Pro - 具备深度代码理解能力和精准的问题识别能力。</p>
           <div class="design-stats">
             <span>模型: deepseek-chat</span>
             <span>类型: 大语言模型</span>
@@ -382,9 +375,9 @@
                 <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/>
               </svg>
             </div>
-            <h3 data-i18n="dataAcquisition">数据获取</h3>
+            <h3>数据获取</h3>
           </div>
-          <p data-i18n="dataAcquisitionDesc">GitHub REST API - 获取 PR 元数据、文件变更和代码差异，结合 PR 描述理解变更意图。</p>
+          <p>GitHub REST API - 获取 PR 元数据、文件变更和代码差异，结合 PR 描述理解变更意图。</p>
           <div class="design-stats">
             <span>接口: REST v3</span>
             <span>认证: OAuth</span>
@@ -397,9 +390,9 @@
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
             </div>
-            <h3 data-i18n="threatDetection">威胁检测</h3>
+            <h3>威胁检测</h3>
           </div>
-          <p data-i18n="threatDetectionDesc">多维度风险分析：安全漏洞、性能瓶颈、逻辑缺陷、可维护性问题。分级严重程度评估。</p>
+          <p>多维度风险分析：安全漏洞、性能瓶颈、逻辑缺陷、可维护性问题。分级严重程度评估。</p>
           <div class="design-stats">
             <span>分析维度: 4类</span>
             <span>严重等级: 3级</span>
@@ -412,9 +405,9 @@
                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
               </svg>
             </div>
-            <h3 data-i18n="evolutionPath">扩展路径</h3>
+            <h3>扩展路径</h3>
           </div>
-          <p data-i18n="evolutionPathDesc">支持多 AI 模型切换、多平台扩展、自定义规则引擎、团队协作和 CI/CD 集成。</p>
+          <p>支持多 AI 模型切换、多平台扩展、自定义规则引擎、团队协作和 CI/CD 集成。</p>
           <div class="design-stats">
             <span>模型: 3+</span>
             <span>平台: 5+</span>
@@ -432,29 +425,22 @@
           <span class="footer-bracket">]</span>
         </div>
         <div class="footer-info">
-          <p data-i18n="footerTitle">AI PR Review 助手 - 七牛云实训项目</p>
-          <p class="footer-tech" data-i18n="footerTech">Node.js + DeepSeek API + GitHub/Gitee API</p>
+          <p>AI PR Review 助手 - 七牛云实训项目</p>
+          <p class="footer-tech">Node.js + DeepSeek API + GitHub/Gitee API</p>
         </div>
         <div class="footer-author">
-          <span class="author-label" data-i18n="engineeredBy">开发者</span>
-          <span class="author-name" data-i18n="authorName">张顺</span>
+          <span class="author-label">开发者</span>
+          <span class="author-name">张顺</span>
         </div>
       </div>
       <div class="footer-line"></div>
       <div class="footer-copyright">
-        <span data-i18n="copyright">© 2026 PRISM 系统</span>
+        <span>© 2026 PRISM 系统</span>
         <span class="footer-version">v2.0.0</span>
       </div>
     </footer>
   </div>
 
-  <script src="i18n.js"></script>
   <script src="app.js"></script>
-  <script>
-    // 初始化语言
-    document.addEventListener('DOMContentLoaded', () => {
-      i18n.updatePageLanguage();
-    });
-  </script>
 </body>
 </html>
