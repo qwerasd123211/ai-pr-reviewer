@@ -79,7 +79,13 @@ async function getGithubPrDetails(owner, repo, prNumber) {
   console.log('[DEBUG] GitHub Headers:', JSON.stringify(githubHeaders, null, 2));
   console.log('[DEBUG] GITHUB_TOKEN exists:', !!GITHUB_TOKEN);
 
-  const response = await fetch(url, { headers: githubHeaders });
+  // 如果没有 Token，尝试无认证访问（适合公共仓库）
+  const headers = GITHUB_TOKEN ? githubHeaders : {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'AI-PR-Reviewer'
+  };
+
+  const response = await fetch(url, { headers });
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -89,6 +95,9 @@ async function getGithubPrDetails(owner, repo, prNumber) {
     }
     if (response.status === 403) {
       throw new Error('API访问受限，请配置GITHUB_TOKEN');
+    }
+    if (response.status === 401) {
+      throw new Error('GitHub Token 认证失败，请检查 GITHUB_TOKEN 是否正确');
     }
     throw new Error(`GitHub API错误: ${response.status}`);
   }
