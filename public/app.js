@@ -187,11 +187,13 @@ function isValidPrUrl(url) {
 // ============================================
 
 function handleSSEMessage(data) {
+  console.log('[DEBUG] SSE Message:', data.type, data);
   switch (data.type) {
     case 'progress':
       updateProgress(data.message, data.progress);
       break;
     case 'result':
+      console.log('[DEBUG] Received result, calling showResult');
       showResult(data.data);
       break;
     case 'error':
@@ -275,6 +277,7 @@ const HISTORY_KEY = 'prism_analysis_history';
 const MAX_HISTORY = 10;
 
 function showResult(data) {
+  console.log('[DEBUG] showResult called', data);
   hideAllSections();
 
   // 保存当前分析数据
@@ -283,37 +286,44 @@ function showResult(data) {
   // 保存到历史记录
   saveToHistory(data);
 
-  // 显示 PR 信息
-  displayPrInfo(data.prInfo, data.filesCount);
+  try {
+    // 显示 PR 信息
+    displayPrInfo(data.prInfo, data.filesCount);
 
-  // 显示评分
-  displayScore(data.analysis.score);
+    // 显示评分
+    displayScore(data.analysis.score);
 
-  // 显示变更总结
-  elements.prSummary.innerHTML = formatMarkdown(data.analysis.summary);
+    // 显示变更总结
+    elements.prSummary.innerHTML = formatMarkdown(data.analysis.summary);
 
-  // 显示风险代码
-  displayRisks(data.analysis.risks);
+    // 显示风险代码
+    displayRisks(data.analysis.risks);
 
-  // 显示安全漏洞扫描
-  if (data.security) {
-    displaySecurity(data.security);
+    // 显示安全漏洞扫描
+    if (data.security) {
+      displaySecurity(data.security);
+    }
+
+    // 显示 Review 建议
+    elements.suggestions.innerHTML = formatMarkdown(data.analysis.suggestions);
+
+    // 显示总体评价
+    elements.conclusion.innerHTML = formatMarkdown(data.analysis.conclusion);
+
+    // 显示一键修复
+    displayFixes(data.analysis.fixes);
+
+    // 显示原始分析
+    elements.rawAnalysis.textContent = data.rawAnalysis;
+  } catch (error) {
+    console.error('[DEBUG] Error displaying result:', error);
+    showError('显示结果时出错: ' + error.message);
+    return;
   }
-
-  // 显示 Review 建议
-  elements.suggestions.innerHTML = formatMarkdown(data.analysis.suggestions);
-
-  // 显示总体评价
-  elements.conclusion.innerHTML = formatMarkdown(data.analysis.conclusion);
-
-  // 显示一键修复
-  displayFixes(data.analysis.fixes);
-
-  // 显示原始分析
-  elements.rawAnalysis.textContent = data.rawAnalysis;
 
   // 显示结果区域
   elements.resultSection.classList.remove('hidden');
+  console.log('[DEBUG] resultSection shown');
 
   // 滚动到结果
   setTimeout(() => {
