@@ -75,9 +75,15 @@ async function getPrDetails(owner, repo, prNumber, platform = 'github') {
 async function getGithubPrDetails(owner, repo, prNumber) {
   const url = `${GITHUB_API}/repos/${owner}/${repo}/pulls/${prNumber}`;
 
+  console.log('[DEBUG] GitHub API URL:', url);
+  console.log('[DEBUG] GitHub Headers:', JSON.stringify(githubHeaders, null, 2));
+  console.log('[DEBUG] GITHUB_TOKEN exists:', !!GITHUB_TOKEN);
+
   const response = await fetch(url, { headers: githubHeaders });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    console.log('[DEBUG] GitHub API Error:', response.status, errorText);
     if (response.status === 404) {
       throw new Error('PR不存在，请检查链接是否正确');
     }
